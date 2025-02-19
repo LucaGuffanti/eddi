@@ -5,35 +5,12 @@
 
 
 import numpy as np
+from constants import *
+
 
 SHIELDING_CONSTANTS_TABLE = {}
 
-ORBITAL_TO_QUANTUM_NUMBER = {
-    "s" : 0,
-    "p" : 1,
-    "d" : 2,
-    "f" : 3
-}
 
-QUANTUM_NUMBER_TO_ORBITAL = {
-    0 : "s",
-    1 : "p",
-    2 : "d",
-    3 : "f"
-}
-
-MAX_ELECTRONS_PER_LEVEL = {
-    "s" : 2,
-    "p" : 6,
-    "d" : 8,
-    "f" : 14
-}
-
-# Highest energy level, equal to the highest quantum number we admit
-HIGHEST_ENERGY_LEVEL = 5
-
-# Ordering of the orbitals as prescribed by Slater.
-ORBITALS_ORDERING = np.array([(i, j) for i in range(HIGHEST_ENERGY_LEVEL + 1) for j in range(i)])
 
 def configuration_to_tuple(configuration: str) -> tuple:
     """Transforms the electron configuration string into a list of tuples that indicate the quantum numbers of the electrons in the
@@ -83,6 +60,8 @@ def configuration_to_tuple(configuration: str) -> tuple:
     print("_______________________________________")
     if (ionized_flag):
         print("-> Atom is ionized.")
+    else:
+        print("-> Atom is not ionized.")
     return (configuration_dict, total_p)
 
 
@@ -94,7 +73,7 @@ def _compute_shielding_constant(configuration: str, target_electron: tuple) -> t
         configuration (str): the electron configuration of the atom
         target_electron (tuple): the quantum numbers of the target electron. Expected as the tuple (n,l)
     Returns:
-        tuple: a tuple (s, z_eff). s is the shielding constant and z_eff is the effective nuclear charge.
+        tuple: a tuple (s, z_eff, zeta). s is the shielding constant, z_eff is the effective nuclear charge and zeta is the overall exponent (without sign).
     """
 
     n,l = target_electron
@@ -126,8 +105,8 @@ def _compute_shielding_constant(configuration: str, target_electron: tuple) -> t
     # less by one, and an amount 1.00 from each electron still further in
     
     # Start by computing the lower orbitals
-    lower_orbitals  = [(i, j) for (i, j) in ORBITALS_ORDERING if (i, j) in configuration_dict.keys() and i < n]
-    for (i, j) in ORBITALS_ORDERING:
+    lower_orbitals  = [(i, j) for (i, j) in SLATER_ORBITALS_ORDERING if (i, j) in configuration_dict.keys() and i < n]
+    for (i, j) in SLATER_ORBITALS_ORDERING:
         if (i, j) in configuration_dict.keys() and i == n:
             if j <= 1 and l <= 1:
                 pass
@@ -165,7 +144,7 @@ def _compute_shielding_constant(configuration: str, target_electron: tuple) -> t
         shielding = shielding + remaining_electrons * 1.00
         print("Target is not s nor p. Subtracting 1.00 for", remaining_electrons, "in other orbitals")
 
-    return (shielding, total_p - shielding)
+    return (shielding, total_p - shielding, (total_p - shielding) / SLATER_PRINCIPAL_QUANTUM_NUMBER[n])
 
 def compute_shielding_constant(configuration: str, target_electron: str) -> tuple:
     """Computes the shielding constant given the parameters of the specific electron as well as the effective 
@@ -188,4 +167,4 @@ def compute_shielding_constant(configuration: str, target_electron: str) -> tupl
 if __name__ == "__main__":
     
     # Testing with the 2 s/p electrons of carbon
-    print(compute_shielding_constant("1s2 2s2 2p2", "2s"))
+    print(compute_shielding_constant("1s2 2s2 2p6 3s2 3p6 4s2 3d6", "1s"))
