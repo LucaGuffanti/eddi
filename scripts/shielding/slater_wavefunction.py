@@ -11,8 +11,8 @@ from shielding_constant_calculator import ShieldingConstantsCalculator
 
 class SlaterWaveFunction():
     def __init__(self, atomic_number: int):
-        self.norm_epsilon = 1e-8
-        self.number_electrons_epsilon = 1e-8
+        self.norm_epsilon = 1e-9
+        self.number_electrons_epsilon = 1e-9
 
         self.atomic_number = atomic_number
         self.shielding_constants_calculator = ShieldingConstantsCalculator()
@@ -44,7 +44,7 @@ class SlaterWaveFunction():
             functions (tuple): a tuple containing the wavefunction and the density function
         """
         
-        print("Constructing wavefunction for configuration:", electron_configuration)
+        print("=== Constructing wavefunction for :", electron_configuration[0][1],",",electron_configuration[0][2], "===")
         
         n_star = int(electron_configuration[0][2][0])
         zeta   = electron_configuration[1][3]
@@ -68,7 +68,7 @@ class SlaterWaveFunction():
         print(" Compt. N        = ", norm_constant_computed)
         print(" Error      |e|  = ", abs(norm_constant_theoretical - norm_constant_computed))
         error_match = abs(norm_constant_theoretical - norm_constant_computed) < self.norm_epsilon
-        print("    check: |e| < ε_n ?      = ", abs(norm_constant_theoretical - norm_constant_computed) < self.norm_epsilon)
+        print(" check: |e| < ε_n ?  = ", abs(norm_constant_theoretical - norm_constant_computed) < self.norm_epsilon)
         
         n_constant = 0
         if (error_match):
@@ -78,17 +78,15 @@ class SlaterWaveFunction():
             print("    -> !!!Large error. Check calculations!!!")
             print("       Will use theoretical normalization constant.")
             n_constant = norm_constant_theoretical
-        print("----Wave function data----")
 
         wf = lambda r: n_constant * r**(n_star - 1) * np.exp(-zeta * r)
         density = lambda r: n_e * (n_constant * r**(n_star - 1) * np.exp(-zeta * r))**2
 
         print("----Density Wave function check----")
         integral, _ = spi.quad(lambda r: density(r) * r**2, 0, np.inf)
-        print(" ∫ρ(r)r^2dr                = ", integral)
-        print(" n_e                    = ", n_e)
+        print(" ∫ρ(r)r^2dr  = ", integral)
+        print(" n_e         = ", n_e)
         print(" check: |n_e - ∫ρ(r)r^2dr| < ε_r  = ", abs(n_e - integral) < self.number_electrons_epsilon)
-        print("----Density Wave function check----")
 
         return (wf, density)
 
@@ -96,16 +94,16 @@ class SlaterWaveFunction():
         """Verifies that the density functions are overall correct by computing the integral throughout the domain
         """
 
-        print("----Global density check----")
+        print("=== Global Density Check ===")
+
         computed_electrons = 0
         for density in self.density_functions:
             integral, _ = spi.quad(lambda r: density(r) * r**2, 0, np.inf)
             computed_electrons += integral
 
-        print(" Σ∫ρ(r)dr = ", computed_electrons)
-        print(" n_e      = ", self.atomic_number)
-        print(" check: |n_e - Σ∫ρ(r)dr| < ε_r  = ", abs(self.atomic_number - computed_electrons) < self.number_electrons_epsilon)
-        print("----Global density check----")
+        print(" Σ∫ρ(r)r^2dr = ", computed_electrons)
+        print(" n_e         = ", self.atomic_number)
+        print(" check: |n_e - Σ∫ρ(r)r^2dr| < ε_r = ", abs(self.atomic_number - computed_electrons) < self.number_electrons_epsilon)
 
     def density(self, r: float) -> float:
         """Computes the total electron density at a given distance from the nucleus.
@@ -121,6 +119,5 @@ class SlaterWaveFunction():
 
 
 if __name__ == '__main__':
-    wf = SlaterWaveFunction(6)
-    wf.density(0.05)
+    wf = SlaterWaveFunction(26)
     print(wf.density(1.0))
