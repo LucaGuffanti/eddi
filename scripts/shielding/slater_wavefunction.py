@@ -204,6 +204,7 @@ class SlaterWaveFunction():
 
         for r in np.arange(start, end, step):
             res_elec.append(self.electrons(r))
+            res_dist.append(r)
         return (res_dist, res_elec)
     
     def compute_single_density_functions(self, start: float, end: float, step: float) -> list:
