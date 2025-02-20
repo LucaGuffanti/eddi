@@ -13,9 +13,15 @@ import csv
 from shielding_constants import compute_shielding_constant
 from constants import *
 
+print("=====INITIALIZING ELECTRON CONFIGURATIONS=====")
+ORBITALS_GROWTH_ORDERING = ['1s', '2s', '2p', '3s', '3p', '4s', '3d', '4p']
+SINGLE_ORBITALS = { orbital: [f"{orbital}{i}" for i in range(1, MAX_ELECTRONS_PER_LEVEL[orbital[1]] + 1)] for orbital in ORBITALS_GROWTH_ORDERING }
 
 class ShieldingConstantsCalculator:
     def __init__(self):
+        self.ORBITALS_GROWTH_ORDERING  = ORBITALS_GROWTH_ORDERING
+        self.SINGLE_ORBITALS           = SINGLE_ORBITALS
+        self.SHIELDING_CONSTANTS_TABLE = None
         pass
 
     def compute(self, lower_z: int = 1, upper_z: int = 6):
@@ -23,14 +29,6 @@ class ShieldingConstantsCalculator:
         self.LOWER_BOUND_Z = lower_z
         self.UPPER_BOUND_Z = upper_z
 
-        self.ORBITALS_GROWTH_ORDERING  = None
-        self.SINGLE_ORBITALS           = None
-        self.SHIELDING_CONSTANTS_TABLE = None
-
-        print("=====INITIALIZING ELECTRON CONFIGURATIONS=====")
-
-        self.ORBITALS_GROWTH_ORDERING = ['1s', '2s', '2p', '3s', '3p', '4s', '3d', '4p']
-        self.SINGLE_ORBITALS = { orbital: [f"{orbital}{i}" for i in range(1, MAX_ELECTRONS_PER_LEVEL[orbital[1]] + 1)] for orbital in self.ORBITALS_GROWTH_ORDERING }
 
         def generate_configuration(atomic_number: int) -> str:
             """Generates the electron configuration of an atom given its atomic number.

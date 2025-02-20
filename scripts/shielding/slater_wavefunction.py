@@ -10,6 +10,36 @@ from constants import *
 from shielding_constant_calculator import ShieldingConstantsCalculator
 
 class SlaterWaveFunction():
+    """Class that computes the Slater wavefunction for an atomic species, given its atomic number.
+    Attributes:
+        norm_epsilon (float): Tolerance for normalization constant error.
+        number_electrons_epsilon (float): Tolerance for electron number error.
+        atomic_number (int): Atomic number of the species.
+        shielding_constants_calculator (ShieldingConstantsCalculator): Instance to compute shielding constants.
+        electron_configurations (list): List of electron configurations.
+        radial_wave_functions (list): List of radial wave functions.
+        density_functions (list): List of density functions.
+    Methods:
+        __init__(atomic_number: int):
+            Initializes the SlaterWaveFunction with the given atomic number.
+        construct_wavefunction(electron_configuration: str) -> tuple:
+            Constructs the Slater radial wavefunction and the total density function for a given electron configuration.
+        check_global_density():
+            Verifies that the density functions are overall correct by computing the integral throughout the domain.
+        density(r: float) -> float:
+            Computes the total electron density at a given distance from the nucleus.
+        compute_density_in_interval(start: float, end: float, step: float) -> list:
+            Computes the electron density in an interval of distances from the nucleus.
+        electrons(r: float) -> float:
+            Computes the number of electrons at a given distance from the nucleus.
+        compute_electrons_in_interval(start: float, end: float, step: float) -> list:
+            Computes the number of electrons at an incremental radius from the nucleus by integrating the density functions.
+        compute_single_density_functions(start: float, end: float, step: float) -> list:
+            Computes the densities for each wavefunction separately.
+        compute_single_electrons(start: float, end: float, step: float) -> list:
+            Computes the number of electrons for each wavefunction separately.
+    """
+
     def __init__(self, atomic_number: int):
         self.norm_epsilon = 1e-9
         self.number_electrons_epsilon = 1e-9
@@ -115,8 +145,115 @@ class SlaterWaveFunction():
             float: total electron density at the given distance
         """
         return sum([density(r) for density in self.density_functions])
+    
+    def electrons(self, r:float) -> float:
+        """Computes the number of electrons at a given distance from the nucleus.
+        
+        Args:
+            r (float): distance from the nucleus
 
+        Returns:
+            float: total electron number at the given distance
+        """
+        electrons = 0
+        for density in self.density_functions:
+            integral, _ = spi.quad(lambda r: density(r) * r**2, 0, r)
+            electrons += integral
+        return electrons
 
+    def compute_density_in_interval(self, start: float, end: float, step: float) -> list:
+        """Computes the electron density in an interval of distances from the nucleus.
+
+        Args:
+            start (float): starting distance from the nucleus
+            end (float): ending distance from the nucleus
+            step (float): step size
+
+        Returns:
+            tuple: list of distances and list of electron densities at the given distances
+        """
+        assert start <= end, "Start distance must be less than or equal to end distance."
+        assert step > 0, "Step size must be positive."
+
+        res_dist = []
+        res_dens = []
+
+        for r in np.arange(start, end, step):
+            density = self.density(r)  
+            res_dist.append(r)
+            res_dens.append(density)        
+        return (res_dist, res_dens)
+    
+    def compute_electrons_in_interval(self, start: float, end: float, step: float) -> list:
+        """Computes the number of electrons at an incremental radius from the nucleus by integrating the density functions.
+
+        Args:
+            start (float): starting distance from the nucleus
+            end (float): ending distance from the nucleus
+            step (float): step size
+
+        Returns:
+            list: list of distances and list of computed electrons at the given distance
+        """
+        
+        assert start <= end, "Start distance must be less than or equal to end distance."
+        assert step > 0, "Step size must be positive."
+
+        res_dist = []
+        res_elec = []
+
+        for r in np.arange(start, end, step):
+            res_elec.append(self.electrons(r))
+        return (res_dist, res_elec)
+    
+    def compute_single_density_functions(self, start: float, end: float, step: float) -> list:
+        """Computes the density functions for the individual electrons in the atom.
+
+        Args:
+            start (float): starting distance from the nucleus
+            end (float): ending distance from the nucleus
+            step (float): step size
+
+        Returns:
+            tuple: list of distances and matrix of electron densities at the given distances
+        """
+        assert start <= end, "Start distance must be less than or equal to end distance."
+        assert step > 0, "Step size must be positive."
+
+        res_dist = [r for r in np.arange(start, end, step)]
+        res_matrix = []
+        res_dens = []
+
+        for density in self.density_functions:
+            res_dens = []
+            for r in res_dist:
+                res_dens.append(density(r))
+            res_matrix.append(res_dens)
+        
+        return (res_dist, res_matrix)
+    
+    def compute_single_electron_functions(self, start: float, end: float, step: float) -> list:
+        """Computes the number of electrons for each wavefunction separately.
+
+        Args:
+            start (float): Starting distance from the nucleus
+            end (float): Ending distance from the nucleus
+            step (float): Step size
+
+        Returns:
+            list: List of distances and matrix of computed electrons at the given distances for each wavefunction
+        """
+        res_dist = [r for r in np.arange(start, end, step)]
+        res_matrix = []
+        res_dens = []
+
+        for density in self.density_functions:
+            res_dens = []
+            for r in res_dist:
+                integral, _ = spi.quad(lambda r: density(r) * r**2, 0, r)
+                res_dens.append(integral)
+            res_matrix.append(res_dens)
+        return (res_dist, res_matrix)
 
 if __name__ == '__main__':
     wf = SlaterWaveFunction(26)

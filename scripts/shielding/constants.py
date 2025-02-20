@@ -30,6 +30,8 @@ SLATER_PRINCIPAL_QUANTUM_NUMBER = {
     6 : 4.2 
 }
 
+SLATER_GROWTH_GROUPS = ['1s', '2s-p', '3s-p', '4s-p', '3d']
+
 # Highest energy level, equal to the highest quantum number we admit
 HIGHEST_ENERGY_LEVEL = 5
 
