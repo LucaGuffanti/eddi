@@ -6,7 +6,6 @@
 # Reference:
 # (Slater, J. C. Phys. Rev. 36 (1): 57–64. Bibcode:1930PhRv...36...57S. doi:10.1103/PhysRev.36.57).
 
-import scipy.integrate as spi
 import matplotlib.pyplot as plt
 import os
 import csv
@@ -16,7 +15,10 @@ from constants import *
 
 
 class ShieldingConstantsCalculator:
-    def __init__(self, lower_z: int = 1, upper_z: int = 6):
+    def __init__(self):
+        pass
+
+    def compute(self, lower_z: int = 1, upper_z: int = 6):
         assert lower_z >= 1 and lower_z <= upper_z, "Invalid range of atomic numbers"
         self.LOWER_BOUND_Z = lower_z
         self.UPPER_BOUND_Z = upper_z
@@ -62,7 +64,7 @@ class ShieldingConstantsCalculator:
         print("=====COMPUTING SHIELDING CONSTANTS=====")
 
         self.SHIELDING_CONSTANTS_TABLE = {
-            (z + 1, configuration, target[0]+target[1]) : (compute_shielding_constant(configuration, target[0]+target[1]))
+            (self.LOWER_BOUND_Z + z, configuration, target[0]+target[1]) : (compute_shielding_constant(configuration, target[0]+target[1]))
                 for z, configuration in enumerate(self.ATOMIC_NUMBER_TO_CONFIGURATION.values())
                 for target in configuration.split(" ")  
                 if target[1] in ['s', 'd', 'f'] 
@@ -73,7 +75,7 @@ class ShieldingConstantsCalculator:
         print("=====SHIELDING CONSTANTS=====")
         for key, value in self.SHIELDING_CONSTANTS_TABLE.items():
             print(f"AtomicNumber: {key[0]}, Configuration: {key[1]}, TargetElectron: {key[2]}")
-            print(f"ShieldingConstant: {value[0]:7f}, EffectiveNuclearCharge: {value[1]:7f}, ZetaCoefficient: {value[2]:7f}")
+            print(f"ElectronsInLevel: {value[0]}, ShieldingConstant: {value[1]:7f}, EffectiveNuclearCharge: {value[2]:7f}, ZetaCoefficient: {value[3]:7f}")
             print("_______________________________________")
 
 
@@ -81,14 +83,37 @@ class ShieldingConstantsCalculator:
         """Prints the data in the shielding constants table to a CSV file"""
 
         print("=====SAVING DATA TO CSV=====")
-        with open(csv_file, mode='w') as file:
-            writer = csv.writer(file)
-            writer.writerow(["AtomicNumber", "Configuration", "TargetElectron", "ShieldingConstant", "EffectiveNuclearCharge", "ZetaCoefficient"])
-            for key, value in self.SHIELDING_CONSTANTS_TABLE.items():
-                writer.writerow([key[0], key[1], key[2], f"{value[0]:7f}", f"{value[1]:7f}", f"{value[2]:7f}"])
-        print(f"Data saved to {csv_file}")
+        try:
+            with open(csv_file, mode='w') as file:
+                writer = csv.writer(file)
+                writer.writerow(["AtomicNumber", "Configuration", "TargetElectron", "ElectronsInLevel" ,"ShieldingConstant", "EffectiveNuclearCharge", "ZetaCoefficient"])
+                for key, value in self.SHIELDING_CONSTANTS_TABLE.items():
+                    writer.writerow([key[0], key[1], key[2], value[0], f"{value[1]:7f}", f"{value[2]:7f}", f"{value[3]:7f}"])
+            print(f"Data saved to {csv_file}")
+        except Exception as e:
+                print(f"Error: {e}")
+                return
 
+    def read_data_from_csv(self, csv_file: str = "shielding_constants.csv"):
+        """Reads the data in the shielding constants table from a CSV file"""
+        print("=====READING DATA FROM CSV=====")
+        try:
+            with open(csv_file, mode='r') as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    print(row)      
+                    if row[0] == "AtomicNumber":
+                        continue
+                    else:
+                        self.SHIELDING_CONSTANTS_TABLE[(int(row[0]), row[1], row[2])] = (float(row[3]), float(row[4]), float(row[5]))
+            print(f"Data read from {csv_file}")
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return      
 
 if __name__ == "__main__":
-    calc = ShieldingConstantsCalculator(1, 26)
+    calc = ShieldingConstantsCalculator()
+    calc.compute(1, 6)
     calc.print_data_to_csv()
+    calc.read_data_from_csv()

@@ -73,7 +73,7 @@ def _compute_shielding_constant(configuration: str, target_electron: tuple) -> t
         configuration (str): the electron configuration of the atom
         target_electron (tuple): the quantum numbers of the target electron. Expected as the tuple (n,l)
     Returns:
-        tuple: a tuple (s, z_eff, zeta). s is the shielding constant, z_eff is the effective nuclear charge and zeta is the overall exponent (without sign).
+        tuple: a tuple (n_e s, z_eff, zeta). n_e is the electrons in the level; s is the shielding constant, z_eff is the effective nuclear charge and zeta is the overall exponent (without sign).
     """
 
     n,l = target_electron
@@ -92,6 +92,7 @@ def _compute_shielding_constant(configuration: str, target_electron: tuple) -> t
     # (a) Nothing from any shell outside the one considered.
     # (b) An amount 0.35 from each other electron in the group considered (except the 1s group, where 0.30 is used)
     remaining_electrons = configuration_dict[(n, l)] - 1
+
     if n == 1:
         shielding = shielding + remaining_electrons * 0.30
     else:
@@ -101,6 +102,7 @@ def _compute_shielding_constant(configuration: str, target_electron: tuple) -> t
         shielding = shielding + remaining_electrons * 0.35
         print("Subtracting 0.35 for", remaining_electrons, "electrons in the valence orbital group")
 
+    total_group_electrons = remaining_electrons + 1;
     # (c) If the shell considered is an s, p shell, an amount 0.85 from each electron with a total quantum 
     # less by one, and an amount 1.00 from each electron still further in
     
@@ -144,7 +146,7 @@ def _compute_shielding_constant(configuration: str, target_electron: tuple) -> t
         shielding = shielding + remaining_electrons * 1.00
         print("Target is not s nor p. Subtracting 1.00 for", remaining_electrons, "in other orbitals")
 
-    return (shielding, total_p - shielding, (total_p - shielding) / SLATER_PRINCIPAL_QUANTUM_NUMBER[n])
+    return (total_group_electrons, shielding, total_p - shielding, (total_p - shielding) / SLATER_PRINCIPAL_QUANTUM_NUMBER[n])
 
 def compute_shielding_constant(configuration: str, target_electron: str) -> tuple:
     """Computes the shielding constant given the parameters of the specific electron as well as the effective 
@@ -155,7 +157,7 @@ def compute_shielding_constant(configuration: str, target_electron: str) -> tupl
         configuration (str): the electron configuration of the atom
         target_electron (tuple): the quantum numbers of the target electron. Expected as the tuple (n,l)
     Returns:
-        tuple: a tuple (s, z_eff). s is the shielding constant and z_eff is the effective nuclear charge.
+        tuple: a tuple (n_e, s, z_eff, zeta). n_e is the electrons in the level; s is the shielding constant and z_eff is the effective nuclear charge. Zeta is the overall exponent (without sign).
     """
     n = int(target_electron[0])
     l = ORBITAL_TO_QUANTUM_NUMBER[target_electron[1]]
