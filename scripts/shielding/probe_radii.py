@@ -45,6 +45,16 @@ def plot_single_density_functions(atomic_num: int):
     plt.savefig(f"output/z_{atomic_num}/density_functions_all.pdf")
     plt.close()
 
+    # Plot the sum of all density functions
+    plt.figure(figsize=(10, 10))
+    plt.plot(distances, np.sum(density_matrix, axis=0), label="Sum", color='black', alpha=1)
+    plt.title("Sum of density functions")
+    plt.xlabel("Distance from nucleus")
+    plt.ylabel("Density")
+    plt.legend()
+    plt.savefig(f"output/z_{atomic_num}/density_sum.pdf")
+    plt.close()
+
 def plot_single_electron_functions(atomic_num: int):
     wf = SlaterWaveFunction(atomic_num)
     (distances, electron_matrix) = wf.compute_single_electron_functions(START, END, STEP_SIZE)
@@ -76,6 +86,16 @@ def plot_single_electron_functions(atomic_num: int):
     plt.savefig(f"output/z_{atomic_num}/electron_all.pdf")
     plt.close()
 
+    # Plot the sum of all electron functions
+    plt.figure(figsize=(10, 10))
+    plt.plot(distances, np.sum(electron_matrix, axis=0), label="Sum", color='black', alpha=1)
+    plt.title("Sum of electron functions")
+    plt.xlabel("Distance from nucleus")
+    plt.ylabel("Electrons")
+    plt.legend()
+    plt.savefig(f"output/z_{atomic_num}/electron_sum.pdf")
+    plt.close()
+
 def process_atomic_number(z):
     try:
         os.mkdir(f"output/z_{z}")
@@ -86,27 +106,10 @@ def process_atomic_number(z):
     (distances, densities) = slater_wf.compute_density_in_interval(START, END, STEP_SIZE)
     (_, electrons) = slater_wf.compute_electrons_in_interval(START, END, STEP_SIZE)
 
-    plot_density(densities, z)
-    plot_electrons(electrons, z)
     plot_density_and_electrons(densities, electrons, z)
 
     return densities, electrons
 
-def plot_density(densities, z):
-    plt.plot(densities)
-    plt.title(f"Density - Atomic number {z}")
-    plt.xlabel("Distance from nucleus")
-    plt.ylabel("Density")
-    plt.savefig(f"output/z_{z}/density.pdf")
-    plt.close()
-
-def plot_electrons(electrons, z):
-    plt.plot(electrons)
-    plt.title(f"Electrons - Atomic number {z}")
-    plt.xlabel("Distance from nucleus")
-    plt.ylabel("Electrons")
-    plt.savefig(f"output/z_{z}/electrons.pdf")
-    plt.close()
 
 def plot_density_and_electrons(densities, electrons, z):
     fig, ax1 = plt.subplots(figsize=(10, 10))
@@ -165,13 +168,13 @@ def main(atomic_num=8):
         all_electrons.append(electrons)
         plot_single_density_functions(z)
         plot_single_electron_functions(z)
-    
+
     plot_all_densities(all_densities)
     plot_all_electrons(all_electrons)
 
 if __name__ == "__main__":
     LOWEST_Z = 1
-    HIGHEST_Z = 6
+    HIGHEST_Z = 26
     START = 0
     END = 10
     STEP_SIZE = 0.01
