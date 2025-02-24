@@ -20,8 +20,8 @@ class SlaterWaveFunction():
         radial_wave_functions (list): List of radial wave functions.
         density_functions (list): List of density functions.
     Methods:
-        __init__(atomic_number: int):
-            Initializes the SlaterWaveFunction with the given atomic number.
+        __init__(atomic_number: int, verbose: bool):
+            Initializes the SlaterWaveFunction with the given atomic number and verbosity.
         construct_wavefunction(electron_configuration: str) -> tuple:
             Constructs the Slater radial wavefunction and the total density function for a given electron configuration.
         check_global_density():
@@ -40,23 +40,23 @@ class SlaterWaveFunction():
             Computes the number of electrons for each wavefunction separately.
     """
 
-    def __init__(self, atomic_number: int):
+    def __init__(self, atomic_number: int, verbose: bool = False):
         self.norm_epsilon = 1e-9
         self.number_electrons_epsilon = 1e-9
+        self.verbose = verbose
 
         self.atomic_number = atomic_number
         self.shielding_constants_calculator = ShieldingConstantsCalculator()
         self.shielding_constants_calculator.compute(atomic_number, atomic_number)
 
-        self.shielding_constants_calculator.print_data()
+        if self.verbose:
+            self.shielding_constants_calculator.print_data()
 
         self.electron_configurations = list(self.shielding_constants_calculator.SHIELDING_CONSTANTS_TABLE.items())
-        print(self.electron_configurations)
 
         self.radial_wave_functions = list()
         self.density_functions = list()
         for conf in self.electron_configurations:
-            # print(conf[1][0])
             (wf, density) = self.construct_wavefunction(conf)
             self.radial_wave_functions.append(wf)
             self.density_functions.append(density)
@@ -74,49 +74,57 @@ class SlaterWaveFunction():
             functions (tuple): a tuple containing the wavefunction and the density function
         """
         
-        print("=== Constructing wavefunction for :", electron_configuration[0][1],",",electron_configuration[0][2], "===")
+        if self.verbose:
+            print("=== Constructing wavefunction for :", electron_configuration[0][1],",",electron_configuration[0][2], "===")
         
         n_star = int(electron_configuration[0][2][0])
         zeta   = electron_configuration[1][3]
         n_e    = electron_configuration[1][0]
 
-        print(" Orbital     n   = ", electron_configuration[0][2][0])
-        print(" Orbital     l   = ", electron_configuration[0][2][1])
-        print(" Slater orb  n_* = ", n_star)
-        print(" Zeta        ζ   = ", zeta)
-        print(" Electrons   n_e = ", n_e)
+        if self.verbose:
+            print(" Orbital     n   = ", electron_configuration[0][2][0])
+            print(" Orbital     l   = ", electron_configuration[0][2][1])
+            print(" Slater orb  n_* = ", n_star)
+            print(" Zeta        ζ   = ", zeta)
+            print(" Electrons   n_e = ", n_e)
 
         wf = lambda r: r**(n_star - 1) * np.exp(-zeta * r)
         # Normalize the wavefunction in the interval [0, +inf]
 
-        print("----Wave function data----")
+        if self.verbose:
+            print("----Wave function data----")
         integral, _ = spi.quad(lambda r: wf(r) ** 2 * r**2, 0, np.inf)
-        print(" ∫Ψ*(r)Ψ(r)r^2dr = ", integral)
+        if self.verbose:
+            print(" ∫Ψ*(r)Ψ(r)r^2dr = ", integral)
         norm_constant_computed = 1 / np.sqrt(integral)
         norm_constant_theoretical = (2 * zeta) ** (n_star + 0.5) / np.sqrt(math.factorial(2 * n_star))
-        print(" Th. N           = ", norm_constant_theoretical)
-        print(" Compt. N        = ", norm_constant_computed)
-        print(" Error      |e|  = ", abs(norm_constant_theoretical - norm_constant_computed))
-        error_match = abs(norm_constant_theoretical - norm_constant_computed) < self.norm_epsilon
-        print(" check: |e| < ε_n ?  = ", abs(norm_constant_theoretical - norm_constant_computed) < self.norm_epsilon)
+        if self.verbose:
+            print(" Th. N           = ", norm_constant_theoretical)
+            print(" Compt. N        = ", norm_constant_computed)
+            print(" Error      |e|  = ", abs(norm_constant_theoretical - norm_constant_computed))
+            print(" check: |e| < ε_n ?  = ", abs(norm_constant_theoretical - norm_constant_computed) < self.norm_epsilon)
         
         n_constant = 0
-        if (error_match):
-            print("    -> Will use computed normalization constant.")
+        if (abs(norm_constant_theoretical - norm_constant_computed) < self.norm_epsilon):
+            if self.verbose:
+                print("    -> Will use computed normalization constant.")
             n_constant = norm_constant_computed
         else:
-            print("    -> !!!Large error. Check calculations!!!")
-            print("       Will use theoretical normalization constant.")
+            if self.verbose:
+                print("    -> !!!Large error. Check calculations!!!")
+                print("       Will use theoretical normalization constant.")
             n_constant = norm_constant_theoretical
 
         wf = lambda r: n_constant * r**(n_star - 1) * np.exp(-zeta * r)
         density = lambda r: n_e * (n_constant * r**(n_star - 1) * np.exp(-zeta * r))**2
 
-        print("----Density Wave function check----")
+        if self.verbose:
+            print("----Density Wave function check----")
         integral, _ = spi.quad(lambda r: density(r) * r**2, 0, np.inf)
-        print(" ∫ρ(r)r^2dr  = ", integral)
-        print(" n_e         = ", n_e)
-        print(" check: |n_e - ∫ρ(r)r^2dr| < ε_r  = ", abs(n_e - integral) < self.number_electrons_epsilon)
+        if self.verbose:
+            print(" ∫ρ(r)r^2dr  = ", integral)
+            print(" n_e         = ", n_e)
+            print(" check: |n_e - ∫ρ(r)r^2dr| < ε_r  = ", abs(n_e - integral) < self.number_electrons_epsilon)
 
         return (wf, density)
 
@@ -124,16 +132,18 @@ class SlaterWaveFunction():
         """Verifies that the density functions are overall correct by computing the integral throughout the domain
         """
 
-        print("=== Global Density Check ===")
+        if self.verbose:
+            print("=== Global Density Check ===")
 
         computed_electrons = 0
         for density in self.density_functions:
             integral, _ = spi.quad(lambda r: density(r) * r**2, 0, np.inf)
             computed_electrons += integral
 
-        print(" Σ∫ρ(r)r^2dr = ", computed_electrons)
-        print(" n_e         = ", self.atomic_number)
-        print(" check: |n_e - Σ∫ρ(r)r^2dr| < ε_r = ", abs(self.atomic_number - computed_electrons) < self.number_electrons_epsilon)
+        if self.verbose:
+            print(" Σ∫ρ(r)r^2dr = ", computed_electrons)
+            print(" n_e         = ", self.atomic_number)
+            print(" check: |n_e - Σ∫ρ(r)r^2dr| < ε_r = ", abs(self.atomic_number - computed_electrons) < self.number_electrons_epsilon)
 
     def density(self, r: float) -> float:
         """Computes the total electron density at a given distance from the nucleus.
@@ -257,5 +267,5 @@ class SlaterWaveFunction():
         return (res_dist, res_matrix)
 
 if __name__ == '__main__':
-    wf = SlaterWaveFunction(26)
+    wf = SlaterWaveFunction(26, verbose=True)
     print(wf.density(1.0))
