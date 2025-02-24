@@ -88,9 +88,9 @@ def plot_all(data_dict):
     colors = ['lightgrey', 'lightblue', 'lightgreen', 'lightyellow', 'lightpink', 'lightcoral', 'lightcyan']
 
     for i, title in enumerate(['Radius [$a_0$]', f'Densities [$e^-/a_0^3$]', 'Electrons']):
-        axs[i].plot(Z,bohr_data[i], label="Bohr", linewidth=2, alpha=0.7)
-        axs[i].plot(Z,density_data[i], label=f"Density {density_data[3]}", linewidth=2, alpha=0.7)
-        axs[i].plot(Z,vdw_data[i], label="VDW", linewidth=2, alpha=0.7)
+        axs[i].plot(Z,bohr_data[i], label="Bohr", linewidth=2, alpha=0.7, marker='o')
+        axs[i].plot(Z,density_data[i], label=f"Density {density_data[3]}", linewidth=2, alpha=0.7,marker='s')
+        axs[i].plot(Z,vdw_data[i], label="VDW", linewidth=2, alpha=0.7,marker='*')
         axs[i].set_title(['Atomic radius', 'Electron density at Atomic Radius','Enclosed electrons at Atomic Radius'][i])
         axs[i].set_xlabel("Atomic number")
         axs[i].set_ylabel(title)
