@@ -1,9 +1,12 @@
+
 import os
-import matplotlib.pyplot as plt
 
 from slater_wavefunction import SlaterWaveFunction
-from shielding_constant_calculator import ORBITALS_GROWTH_ORDERING
 from constants import *
+import plotting.plot_densities as plot_densities
+import plotting.plot_electrons as plot_electrons
+import plotting.plot_radii as plot_radii
+import utils.download_data as download_data
 
 def create_output_directory():
     try:
@@ -11,90 +14,121 @@ def create_output_directory():
     except FileExistsError:
         pass
 
-def plot_single_density_functions(atomic_num: int):
-    wf = SlaterWaveFunction(atomic_num)
-    (distances, density_matrix) = wf.compute_single_density_functions(START, END, STEP_SIZE)
+
+BOHR_RADIUS_ANGSTROMS = 0.52917721067 # Angstroms
+BOHR_RADIUS_AU = 1.0 # Atomic Units
+HYDROGEN_DENSITY_AT_BOHR_RADIUS = 0.0
+BOHR_BASED_RADII = []
+BOHR_BASED_EPSILON = 1e-13
+BOHR_BASED_ERRORS = []
+BOHR_BASED_DENSITIES = []
+BOHR_BASED_ITERS = []
+BOHR_BASED_ELECTRONS = []
+def process_bohr_based_atomic_radius(z):
+    slater_wf = SlaterWaveFunction(z)
+    print(f"=== ATOMIC NUMBER {z} ===")
     
-    # Plot each density function with all the others. For each one, highlight it in a single plot
-    for i, densities in enumerate(density_matrix):
-        plt.figure(figsize=(10, 10))
-        for j, other_densities in enumerate(density_matrix):
-            if j == i:
-                plt.plot(distances, other_densities, label=f"Orbital {SLATER_GROWTH_GROUPS[j]}")
-            else:
-                plt.plot(distances, other_densities, label=f"Orbital {SLATER_GROWTH_GROUPS[j]}", alpha=0.3)
+    START = 0
+    END = 10
+    ITERATIONS = 100
 
-        # add the sum
-        plt.plot(distances, np.sum(density_matrix, axis=0), label="Sum", linestyle='--', color='black', alpha=0.5)
-        plt.title(f"Density function - Orbital {SLATER_GROWTH_GROUPS[i]}")
-        plt.xlabel("Distance from nucleus")
-        plt.ylabel("Density")
-        plt.legend()
-        plt.savefig(f"output/z_{atomic_num}/density_orbital_{SLATER_GROWTH_GROUPS[i]}.pdf")
-        plt.close()
+    i = 0
+    found = False
+    density = 0.0
+    while i < ITERATIONS and not found:
+        possible_radius = (START + END)/2
+        density = slater_wf.density(possible_radius)
+        print(f"Testing radius {possible_radius}, density {density}")
+        if density < HYDROGEN_DENSITY_AT_BOHR_RADIUS:
+            END = possible_radius
+        else:
+            START = possible_radius
+
+        if np.abs(density - HYDROGEN_DENSITY_AT_BOHR_RADIUS)/HYDROGEN_DENSITY_AT_BOHR_RADIUS < BOHR_BASED_EPSILON:
+            print(f"Found atomic radius for z = {z}: {possible_radius}. error = {np.abs(density - HYDROGEN_DENSITY_AT_BOHR_RADIUS)/HYDROGEN_DENSITY_AT_BOHR_RADIUS}. it = {i}")
+            BOHR_BASED_RADII.append(possible_radius)
+            BOHR_BASED_DENSITIES.append(density)
+            BOHR_BASED_ERRORS.append(np.abs(density - HYDROGEN_DENSITY_AT_BOHR_RADIUS)/HYDROGEN_DENSITY_AT_BOHR_RADIUS)
+            BOHR_BASED_ITERS.append(i+1)
+            
+            BOHR_BASED_ELECTRONS.append(slater_wf.electrons(possible_radius))
+
+            found = True
+
+        i += 1 
+    if not found:
+        print(f"No convergence for z = {z}. r = {possible_radius}, density = {density}")
+        BOHR_BASED_RADII.append(possible_radius)
+        BOHR_BASED_DENSITIES.append(density)
+        BOHR_BASED_ERRORS.append(np.abs(density - HYDROGEN_DENSITY_AT_BOHR_RADIUS))
+        BOHR_BASED_ITERS.append(i+1)
+        BOHR_BASED_ELECTRONS.append(slater_wf.electrons(possible_radius))
     
-    # Plot all density functions together
-    plt.figure(figsize=(10, 10))
-    for i, densities in enumerate(density_matrix):
-        plt.plot(distances, densities, label=f"Orbital {SLATER_GROWTH_GROUPS[i]}")
-    plt.plot(distances, np.sum(density_matrix, axis=0), label="Sum", linestyle='--', color='black', alpha=0.5)
-    plt.title("Density functions")
-    plt.xlabel("Distance from nucleus")
-    plt.ylabel("Density")
-    plt.legend()
-    plt.savefig(f"output/z_{atomic_num}/density_functions_all.pdf")
-    plt.close()
+    return 
 
-    # Plot the sum of all density functions
-    plt.figure(figsize=(10, 10))
-    plt.plot(distances, np.sum(density_matrix, axis=0), label="Sum", color='black', alpha=1)
-    plt.title("Sum of density functions")
-    plt.xlabel("Distance from nucleus")
-    plt.ylabel("Density")
-    plt.legend()
-    plt.savefig(f"output/z_{atomic_num}/density_sum.pdf")
-    plt.close()
+DENSITY_CUTOFF_BASED_RADII = []
+DENSITY_CUTOFF_BASED_EPSILON = 1e-13
+DENSITY_CUTOFF_BASED_ERRORS = []
+DENSITY_CUTOFF_BASED_DENSITIES = []
+DENSITY_CUTOFF_BASED_ITERS = []
+DENSITY_CUTOFF_BASED_ELECTRONS = []
+def process_density_cutoff_based_atomic_radius(z, cutoff_density):
+    wf = SlaterWaveFunction(z)
 
-def plot_single_electron_functions(atomic_num: int):
-    wf = SlaterWaveFunction(atomic_num)
-    (distances, electron_matrix) = wf.compute_single_electron_functions(START, END, STEP_SIZE)
+    print(f"=== ATOMIC NUMBER {z} ===")
 
-    # Plot each electron function with all the others. For each one, highlight it in a single plot
-    for i, electrons in enumerate(electron_matrix):
-        plt.figure(figsize=(10, 10))
-        for j, other_electrons in enumerate(electron_matrix):
-            if j == i:
-                plt.plot(distances, other_electrons, label=f"Orbital {SLATER_GROWTH_GROUPS[j]}")
-            else:
-                plt.plot(distances, other_electrons, label=f"Orbital {SLATER_GROWTH_GROUPS[j]}", alpha=0.3)
-        plt.plot(distances, np.sum(electron_matrix, axis=0), label="Sum", linestyle='--', color='black', alpha=0.5)
-        plt.title(f"Electron function - Orbital {SLATER_GROWTH_GROUPS[i]}")
-        plt.xlabel("Distance from nucleus")
-        plt.ylabel("Electrons")
-        plt.legend()
-        plt.savefig(f"output/z_{atomic_num}/electron_orbital_{SLATER_GROWTH_GROUPS[i]}.pdf")
+    START = 0
+    END = 10
+    ITERATIONS = 100
 
-    # Plot all electron functions together
-    plt.figure(figsize=(10, 10))
-    for i, electrons in enumerate(electron_matrix):
-        plt.plot(distances, electrons, label=f"Orbital {SLATER_GROWTH_GROUPS[i]}")
-    plt.plot(distances, np.sum(electron_matrix, axis=0), label="Sum", linestyle='--', color='black', alpha=0.5)
-    plt.title("Electron functions")
-    plt.xlabel("Distance from nucleus")
-    plt.ylabel("Electrons")
-    plt.legend()
-    plt.savefig(f"output/z_{atomic_num}/electron_all.pdf")
-    plt.close()
+    i = 0
+    found = False
+    density = cutoff_density + 1
+    possible_radius = 0
+    while np.abs(density - cutoff_density)/cutoff_density > DENSITY_CUTOFF_BASED_EPSILON and i < ITERATIONS:
+        possible_radius = (START + END)/2
+        density = wf.density(possible_radius)
+        print(f"Testing radius {possible_radius}, density {density}")
 
-    # Plot the sum of all electron functions
-    plt.figure(figsize=(10, 10))
-    plt.plot(distances, np.sum(electron_matrix, axis=0), label="Sum", color='black', alpha=1)
-    plt.title("Sum of electron functions")
-    plt.xlabel("Distance from nucleus")
-    plt.ylabel("Electrons")
-    plt.legend()
-    plt.savefig(f"output/z_{atomic_num}/electron_sum.pdf")
-    plt.close()
+        if density < cutoff_density:
+            END = possible_radius
+        else:
+            START = possible_radius
+
+        if np.abs(density - cutoff_density)/cutoff_density < DENSITY_CUTOFF_BASED_EPSILON:
+            print(f"Found atomic radius for z = {z}: {possible_radius}. error = {np.abs(density - cutoff_density)/cutoff_density}. it = {i}")
+            DENSITY_CUTOFF_BASED_RADII.append(possible_radius)
+            DENSITY_CUTOFF_BASED_DENSITIES.append(density)
+            DENSITY_CUTOFF_BASED_ERRORS.append(np.abs(density - cutoff_density)/cutoff_density)
+            DENSITY_CUTOFF_BASED_ITERS.append(i+1)
+            
+            DENSITY_CUTOFF_BASED_ELECTRONS.append(wf.electrons(possible_radius))
+
+            found = True
+        
+        i += 1
+    
+    if not found:
+        print(f"No convergence for z = {z}. r = {possible_radius}, density = {density}")
+        DENSITY_CUTOFF_BASED_RADII.append(possible_radius)
+        DENSITY_CUTOFF_BASED_DENSITIES.append(density)
+        DENSITY_CUTOFF_BASED_ERRORS.append(np.abs(density - cutoff_density))
+        DENSITY_CUTOFF_BASED_ITERS.append(i+1)
+        DENSITY_CUTOFF_BASED_ELECTRONS.append(wf.electrons(possible_radius))
+            
+
+VDW_BASED_RADII_PM = download_data.load_vdw_radii(True)
+VDW_BASED_RADII_BOHRS = [(radius / BOHR_RADIUS_ANGSTROMS) / 100 for radius in VDW_BASED_RADII_PM]
+VDW_BASED_DENSITIES = []
+VDW_BASED_ELECTRONS = []
+def process_vdw_based_atomic_radius():
+    for i, radius in enumerate(VDW_BASED_RADII_BOHRS):
+        slater_wf = SlaterWaveFunction(i+1)
+        VDW_BASED_DENSITIES.append(slater_wf.density(radius))
+        VDW_BASED_ELECTRONS.append(slater_wf.electrons(radius))
+    return
+
+    
 
 def process_atomic_number(z):
     try:
@@ -102,81 +136,74 @@ def process_atomic_number(z):
     except FileExistsError:
         pass
     print(f"=== ATOMIC NUMBER {z} ===")
-    slater_wf = SlaterWaveFunction(z)
-    (distances, densities) = slater_wf.compute_density_in_interval(START, END, STEP_SIZE)
-    (_, electrons) = slater_wf.compute_electrons_in_interval(START, END, STEP_SIZE)
+    slater_wf = SlaterWaveFunction(z, verbose=False)
 
-    plot_density_and_electrons(densities, electrons, z)
-
-    return densities, electrons
-
-
-def plot_density_and_electrons(densities, electrons, z):
-    fig, ax1 = plt.subplots(figsize=(10, 10))
-    color = 'tab:red'
-    ax1.set_xlabel('Distance from nucleus')
-    ax1.set_ylabel('Density', color=color)
-    ax1.plot(densities, color=color)
-    ax1.tick_params(axis='y', labelcolor=color)
-
-    ax2 = ax1.twinx()
-    color = 'tab:blue'
-    ax2.set_ylabel('Electrons', color=color)
-    ax2.plot(electrons, color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
-
-    fig.tight_layout()
-    plt.title(f"Density and electrons - Atomic number {z}")
-    plt.savefig(f"output/z_{z}/density_electrons.pdf")
-    plt.close()
-
-def plot_all_densities(all_densities):
-    plt.figure(figsize=(10, 10))
-    plt.vlines(0, 0, max(all_densities[0]) * 1.1, colors='gray', linestyles='dashed', label="Nucleus", alpha=0.4)
-    for i, densities in enumerate(all_densities):
-        plt.plot(densities, label=f"Atomic number {LOWEST_Z + i}")
-    plt.title("Densities")
-    plt.xlabel("Distance from nucleus")
-    plt.xlim([-10, 200])
-    plt.legend()
-    plt.ylabel("Density")
-    plt.savefig("output/densities.pdf")
-    plt.close()
-
-def plot_all_electrons(all_electrons):
-    plt.figure(figsize=(10, 10))
-    plt.vlines(0, 0, max(all_electrons[0]) * 1.1, colors='gray', linestyles='dashed', label="Nucleus", alpha=0.4)
-    for i, electrons in enumerate(all_electrons):
-        plt.plot(electrons, label=f"Atomic number {LOWEST_Z + i}")
-    plt.title("Electrons")
-    plt.xlabel("Distance from nucleus")
-    plt.legend()
-    plt.ylabel("Electrons")
-    plt.savefig("output/electrons.pdf")
-    plt.close()
-
-def main(atomic_num=8):
-    create_output_directory()
-
-
-
-    all_densities = []
-    all_electrons = []
-    for z in range(LOWEST_Z, HIGHEST_Z + 1):
-        densities, electrons = process_atomic_number(z)
-        all_densities.append(densities)
-        all_electrons.append(electrons)
-        plot_single_density_functions(z)
-        plot_single_electron_functions(z)
-
-    plot_all_densities(all_densities)
-    plot_all_electrons(all_electrons)
-
-if __name__ == "__main__":
-    LOWEST_Z = 1
-    HIGHEST_Z = 26
     START = 0
     END = 10
     STEP_SIZE = 0.01
 
-    main()
+    (distances, density_matrix) = slater_wf.compute_single_density_functions(START, END, STEP_SIZE)
+    (_, electron_matrix) = slater_wf.compute_single_electron_functions(START, END, STEP_SIZE)
+    plot_densities.plot_single_density_functions(z, distances, density_matrix)
+    plot_electrons.plot_single_electron_functions(z, distances, electron_matrix)
+
+
+if __name__ == "__main__":
+    create_output_directory()
+
+    LOWEST_Z = 1
+    HIGHEST_Z = 30
+   
+    hydrogen_wf = SlaterWaveFunction(1)
+    HYDROGEN_DENSITY_AT_BOHR_RADIUS = hydrogen_wf.density(BOHR_RADIUS_AU)
+    print("Hydrogen density at bohr radius", HYDROGEN_DENSITY_AT_BOHR_RADIUS)
+
+    # for z in range(LOWEST_Z, HIGHEST_Z + 1):
+    #     process_atomic_number(z)
+
+    BOHR_BASED_RADII.append(BOHR_RADIUS_AU)
+    BOHR_BASED_DENSITIES.append(HYDROGEN_DENSITY_AT_BOHR_RADIUS)
+    BOHR_BASED_ERRORS.append(0.0)
+    BOHR_BASED_ITERS.append(0)
+    BOHR_BASED_ELECTRONS.append(hydrogen_wf.electrons(BOHR_RADIUS_AU))
+
+    DENSITY_CUTOFF_BASED_TARGET_DENSITY = 1e-3
+
+    VDW_BASED_RADII_BOHRS = VDW_BASED_RADII_BOHRS[:HIGHEST_Z]
+
+    for z in range(2, HIGHEST_Z + 1):
+        process_bohr_based_atomic_radius(z)
+
+    for z in range(1, HIGHEST_Z + 1):    
+        process_density_cutoff_based_atomic_radius(z, DENSITY_CUTOFF_BASED_TARGET_DENSITY)
+    
+    plot_radii.plot_type_based_radii(
+        BOHR_BASED_RADII,
+        BOHR_BASED_DENSITIES, 
+        BOHR_BASED_ELECTRONS,
+        BOHR_BASED_ERRORS, 
+        BOHR_BASED_ITERS,
+        BOHR_BASED_EPSILON,
+        'bohr'
+        )
+
+    plot_radii.plot_type_based_radii(
+        DENSITY_CUTOFF_BASED_RADII,
+        DENSITY_CUTOFF_BASED_DENSITIES,
+        DENSITY_CUTOFF_BASED_ELECTRONS,
+        DENSITY_CUTOFF_BASED_ERRORS,
+        DENSITY_CUTOFF_BASED_ITERS,
+        DENSITY_CUTOFF_BASED_EPSILON,
+        'density',
+        DENSITY_CUTOFF_BASED_TARGET_DENSITY
+    )
+
+    process_vdw_based_atomic_radius()
+
+    plot_radii.plot_all(
+        {
+            'bohr': [BOHR_BASED_RADII, BOHR_BASED_DENSITIES, BOHR_BASED_ELECTRONS],
+            'vdw' : [VDW_BASED_RADII_BOHRS, VDW_BASED_DENSITIES, VDW_BASED_ELECTRONS],
+            'density': [DENSITY_CUTOFF_BASED_RADII, DENSITY_CUTOFF_BASED_DENSITIES, DENSITY_CUTOFF_BASED_ELECTRONS, DENSITY_CUTOFF_BASED_TARGET_DENSITY]
+        }
+    )
