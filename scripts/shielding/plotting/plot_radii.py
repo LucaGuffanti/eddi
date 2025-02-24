@@ -41,7 +41,8 @@ def plot_type_based_radii(radii, densities, electrons, errors, iters, epsilon, t
         ax.plot([Z,Z,Z,Z_2,Z_2][i], [radii, densities, electrons, errors, iters][i],'o-')
         ax.set_xlabel("Atomic number")
         ax.set_ylabel(["Atomic radius [$a_0$]", "Density [$e^-/a_0^3$]", "Electrons", "Relative error", "Iterations"][i])
-        ax.set_title(["Atomic radii", "Density at atomic radius", "Enclosed Electrons at atomic radius", type_of_error,"Iterations to convergence"][i])
+
+        ax.set_title(['Atomic radius','Electron density at Atomic Radius','Enclosed electrons at Atomic Radius', type_of_error,'Iterations until convergence'][i])
 
         for j, period in enumerate(periods):
             if period <= len(radii):
@@ -90,7 +91,7 @@ def plot_all(data_dict):
         axs[i].plot(Z,bohr_data[i], label="Bohr", linewidth=2, alpha=0.7)
         axs[i].plot(Z,density_data[i], label=f"Density {density_data[3]}", linewidth=2, alpha=0.7)
         axs[i].plot(Z,vdw_data[i], label="VDW", linewidth=2, alpha=0.7)
-
+        axs[i].set_title(['Atomic radius', 'Electron density at Atomic Radius','Enclosed electrons at Atomic Radius'][i])
         axs[i].set_xlabel("Atomic number")
         axs[i].set_ylabel(title)
 
