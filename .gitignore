@@ -2,3 +2,5 @@
 **/.venv/
 **/.vscode/
 **/output/
+**/scripts/**/data
+**/*.csv
