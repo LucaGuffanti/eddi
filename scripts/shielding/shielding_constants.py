@@ -42,7 +42,8 @@ def configuration_to_tuple(configuration: str, verbose: bool = False) -> tuple:
     for idx, orbital in enumerate(orbitals_list):
         n   = int(orbital[0])
         l   = ORBITAL_TO_QUANTUM_NUMBER[orbital[1]]
-        n_e = int(orbital[2])
+        n_e = int(orbital[2:])
+
 
 
         p = 0

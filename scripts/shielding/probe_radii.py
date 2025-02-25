@@ -136,7 +136,7 @@ def process_atomic_number(z):
     except FileExistsError:
         pass
     print(f"=== ATOMIC NUMBER {z} ===")
-    slater_wf = SlaterWaveFunction(z, verbose=False)
+    slater_wf = SlaterWaveFunction(z)
 
     START = 0
     END = 10
@@ -158,8 +158,8 @@ if __name__ == "__main__":
     HYDROGEN_DENSITY_AT_BOHR_RADIUS = hydrogen_wf.density(BOHR_RADIUS_AU)
     print("Hydrogen density at bohr radius", HYDROGEN_DENSITY_AT_BOHR_RADIUS)
 
-    # for z in range(LOWEST_Z, HIGHEST_Z + 1):
-    #     process_atomic_number(z)
+    for z in range(LOWEST_Z, HIGHEST_Z + 1):
+        process_atomic_number(z)
 
     BOHR_BASED_RADII.append(BOHR_RADIUS_AU)
     BOHR_BASED_DENSITIES.append(HYDROGEN_DENSITY_AT_BOHR_RADIUS)

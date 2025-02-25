@@ -17,7 +17,7 @@ QUANTUM_NUMBER_TO_ORBITAL = {
 MAX_ELECTRONS_PER_LEVEL = {
     "s" : 2,
     "p" : 6,
-    "d" : 8,
+    "d" : 10,
     "f" : 14
 }
 

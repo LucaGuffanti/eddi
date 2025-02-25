@@ -65,20 +65,21 @@ class ShieldingConstantsCalculator:
             print("=====COMPUTING SHIELDING CONSTANTS=====")
 
         self.SHIELDING_CONSTANTS_TABLE = {
-            (self.LOWER_BOUND_Z + z, configuration, target[0]+target[1]) : (compute_shielding_constant(configuration, target[0]+target[1]))
+            (self.LOWER_BOUND_Z + z, configuration, target[0]+target[1]) : (compute_shielding_constant(configuration, target[0]+target[1], verbose=self.verbose))
                 for z, configuration in enumerate(self.ATOMIC_NUMBER_TO_CONFIGURATION.values())
                 for target in configuration.split(" ")  
                 if target[1] in ['s', 'd', 'f'] 
         }
 
+
     def print_data(self):
         """Prints the data in the shielding constants table"""
-        if self.verbose:
-            print("=====SHIELDING CONSTANTS=====")
-            for key, value in self.SHIELDING_CONSTANTS_TABLE.items():
-                print(f"AtomicNumber: {key[0]}, Configuration: {key[1]}, TargetElectron: {key[2]}")
-                print(f"ElectronsInLevel: {value[0]}, ShieldingConstant: {value[1]:7f}, EffectiveNuclearCharge: {value[2]:7f}, ZetaCoefficient: {value[3]:7f}")
-                print("_______________________________________")
+       
+        print("=====SHIELDING CONSTANTS=====")
+        for key, value in self.SHIELDING_CONSTANTS_TABLE.items():
+            print(f"AtomicNumber: {key[0]}, Configuration: {key[1]}, TargetElectron: {key[2]}")
+            print(f"ElectronsInLevel: {value[0]}, ShieldingConstant: {value[1]:7f}, EffectiveNuclearCharge: {value[2]:7f}, ZetaCoefficient: {value[3]:7f}")
+            print("_______________________________________")
 
     def print_data_to_csv(self, csv_file: str = "shielding_constants.csv"):
         """Prints the data in the shielding constants table to a CSV file"""
