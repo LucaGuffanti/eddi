@@ -13,7 +13,7 @@ class AtomDescriptor:
     It uses the Slater wave function to calculate the electron density.
     """
 
-    def __init__(self, atomic_number: int, position: tuple):
+    def __init__(self, atomic_number: int, position: tuple, charge: float=0):
         """
         Initialize the AtomDescriptor with an atomic number and position.
 
@@ -24,6 +24,7 @@ class AtomDescriptor:
         self.atomic_number = atomic_number
         self.position = np.array(position)
         self.slater_wf = SlaterWaveFunction(self.atomic_number)
+        self.charge = 0
         
         self.vdw_radius = (data[self.atomic_number] / 100) * 1.8897259886
         

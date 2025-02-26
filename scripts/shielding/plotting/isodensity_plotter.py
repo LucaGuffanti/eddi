@@ -49,7 +49,7 @@ class IsodensityPlotter:
         ax = fig.add_subplot(111, projection='3d')
 
         verts, faces, _, _ = measure.marching_cubes(density_field, level=isodensity)
-        ax.plot_trisurf(verts[:, 0], verts[:, 1], faces, verts[:, 2], cmap='Spectral', lw=1, alpha=0.7, norm=LogNorm(), antialiased=True)
+        ax.plot_trisurf(verts[:, 0], verts[:, 1], faces, verts[:, 2], cmap='Spectral', lw=1, alpha=0.7, antialiased=True)
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_zlabel('Z')
@@ -62,7 +62,7 @@ class IsodensityPlotter:
             atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
             atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
             atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
-            ax.scatter(atom_x, atom_y, atom_z, color='red', s=100)
+            ax.scatter(atom_x, atom_y, atom_z, color='red', s=50)
 
         def rotate(angle):
             print("Angle ", angle, end='\r')
@@ -89,7 +89,7 @@ class IsodensityPlotter:
 
         print(projection.shape)
         fig, ax = plt.subplots()
-        cax = ax.contourf(projection.T, 50, cmap='viridis', norm=LogNorm(), alpha=0.5)
+        cax = ax.contourf(projection.T, 50, cmap='viridis', alpha=0.5)
         fig.colorbar(cax, ax=ax)
 
         for atom in self.atoms:
@@ -98,11 +98,11 @@ class IsodensityPlotter:
             atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
 
             if plane == 'xy':
-                ax.scatter(atom_x, atom_y, color='red', s=100)
+                ax.scatter(atom_x, atom_y, color='red', s=50)
             elif plane == 'yz':
-                ax.scatter(atom_y, atom_z, color='red', s=100)
+                ax.scatter(atom_y, atom_z, color='red', s=50)
             elif plane == 'xz':
-                ax.scatter(atom_x, atom_z, color='red', s=100)
+                ax.scatter(atom_x, atom_z, color='red', s=50)
 
         plt.savefig(os.path.join(self.output_dir, f"density_field_cumulated_p{plane}.pdf"))
         ax.set_title(f"Cumulated density field (p={plane}) [$e^-/a_0^3$]")
@@ -121,7 +121,7 @@ class IsodensityPlotter:
 
         fig, ax = plt.subplots()
         cax = ax.contour(projection.T, levels=[isodensity], colors='red')
-        cax = ax.contourf(projection.T, 50, cmap='viridis', norm=LogNorm(), alpha=0.5)
+        cax = ax.contourf(projection.T, 50, cmap='viridis', alpha=0.5)
         fig.colorbar(cax, ax=ax)
 
 
@@ -132,11 +132,11 @@ class IsodensityPlotter:
             atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
 
             if plane == 'xy':
-                ax.scatter(atom_y, atom_z, color='red', s=100)
+                ax.scatter(atom_y, atom_z, color='red', s=50)
             elif plane == 'yz':
-                ax.scatter(atom_x, atom_z, color='red', s=100)
+                ax.scatter(atom_x, atom_z, color='red', s=50)
             elif plane == 'xz':
-                ax.scatter(atom_x, atom_y, color='red', s=100)
+                ax.scatter(atom_x, atom_y, color='red', s=50)
 
         plt.savefig(os.path.join(self.output_dir, f"density_field_cumulated_isodensity_p{plane}_i{isodensity}.pdf"))
 
@@ -157,7 +157,7 @@ class IsodensityPlotter:
 
         fig, ax = plt.subplots()
         ax.set_title(f"Density field slice (p={plane}, s={slice_coord}) [$e^-/a_0^3$]")
-        cax = ax.contourf(projection.T, 50, cmap='viridis', norm=LogNorm(), alpha=0.5)
+        cax = ax.contourf(projection.T, 50, cmap='viridis', alpha=0.5)
         fig.colorbar(cax, ax=ax)
 
 
@@ -167,11 +167,11 @@ class IsodensityPlotter:
             atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
 
             if plane == 'xy':
-                ax.scatter(atom_y, atom_z, color='red', s=100)
+                ax.scatter(atom_y, atom_z, color='red', s=50)
             elif plane == 'yz':
-                ax.scatter(atom_x, atom_z, color='red', s=100)
+                ax.scatter(atom_x, atom_z, color='red', s=50)
             elif plane == 'xz':
-                ax.scatter(atom_x, atom_y, color='red', s=100)
+                ax.scatter(atom_x, atom_y, color='red', s=50)
 
         plt.savefig(os.path.join(self.output_dir, f"density_field_slice_p{plane}_s{slice_coord}.pdf"))
 
@@ -198,14 +198,15 @@ class IsodensityPlotter:
             atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
 
             if plane == 'xy':
-                ax.scatter(atom_y, atom_z, color='red', s=100)
+                ax.scatter(atom_y, atom_z, color='red', s=50)
             elif plane == 'yz':
-                ax.scatter(atom_x, atom_z, color='red', s=100)
+                ax.scatter(atom_x, atom_z, color='red', s=50)
             elif plane == 'xz':
-                ax.scatter(atom_x, atom_y, color='red', s=100)
+                ax.scatter(atom_x, atom_y, color='red', s=50)
 
         cax = ax.contour(projection.T, levels=[isodensity], colors='red')
-        cax = ax.contourf(projection.T, 50, cmap='viridis', norm=LogNorm(), alpha=0.5)
+        cax = ax.contourf(projection.T, 50, cmap='viridis', alpha=0.5)
         fig.colorbar(cax, ax=ax)
         
         plt.savefig(os.path.join(self.output_dir, f"density_field_slice_isodensity_p{plane}_s{slice_coord}_i{isodensity}.pdf"))
+

@@ -62,8 +62,8 @@ def from_space_coord_to_grid_coord(space_coord, direction_range, direction_delta
     return int((space_coord - direction_range[0]) / direction_delta)
 
 def main():
-    atom_1 = AtomDescriptor(8, (-1.14, 0, 0))
-    atom_2 = AtomDescriptor(8, (1.14, 0, 0))
+    atom_1 = AtomDescriptor(8, (0, 0, 1.679022))
+    atom_2 = AtomDescriptor(8, (0, 0, -1.679022))
 
     delta_x = 0.1
     delta_y = 0.1
