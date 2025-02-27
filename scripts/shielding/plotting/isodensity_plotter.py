@@ -41,7 +41,7 @@ class IsodensityPlotter:
             return int((space_coord - self.z_range[0]) / self.dz)
         
 
-    def plot_isodensity_3D(self, density_field, isodensity):
+    def plot_isodensity_3D(self, density_field, isodensity, show_atoms=False):
         print("Rendering 3D Isosurface")
 
         fig = plt.figure()
@@ -57,12 +57,13 @@ class IsodensityPlotter:
         ax.grid(True)
         ax.set_title(f"Isosurface at {isodensity} $e^-/a_0^3$")
 
-        # Add red points for each atom
-        for atom in self.atoms:
-            atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
-            atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
-            atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
-            ax.scatter(atom_x, atom_y, atom_z, color='red', s=50)
+        # Add red points for each atom if show_atoms is True
+        if show_atoms:
+            for atom in self.atoms:
+                atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
+                atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
+                atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
+                ax.scatter(atom_x, atom_y, atom_z, color='red', s=50)
 
         def rotate(angle):
             print("Angle ", angle, end='\r')
@@ -76,7 +77,7 @@ class IsodensityPlotter:
         print("Animation completed")
         plt.close()
 
-    def plot_cumulated_density_field_2D(self, density_field, plane='xy'):
+    def plot_cumulated_density_field_2D(self, density_field, plane='xy', show_atoms=False):
         print("Rendering 2D Cumulated Density Field")
         if plane == 'xy':
             projection = np.sum(density_field, axis=2)
@@ -92,30 +93,31 @@ class IsodensityPlotter:
         cax = ax.contourf(projection.T, 50, cmap='viridis', alpha=0.5)
         fig.colorbar(cax, ax=ax)
 
-        for atom in self.atoms:
-            atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
-            atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
-            atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
+        if show_atoms:
+            for atom in self.atoms:
+                atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
+                atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
+                atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
 
-            if plane == 'xy':
-                ax.scatter(atom_x, atom_y, color='red', s=50)
-            elif plane == 'yz':
-                ax.scatter(atom_y, atom_z, color='red', s=50)
-            elif plane == 'xz':
-                ax.scatter(atom_x, atom_z, color='red', s=50)
+                if plane == 'xy':
+                    ax.scatter(atom_x, atom_y, color='red', s=50)
+                elif plane == 'yz':
+                    ax.scatter(atom_y, atom_z, color='red', s=50)
+                elif plane == 'xz':
+                    ax.scatter(atom_x, atom_z, color='red', s=50)
 
         plt.savefig(os.path.join(self.output_dir, f"density_field_cumulated_p{plane}.pdf"))
         ax.set_title(f"Cumulated density field (p={plane}) [$e^-/a_0^3$]")
         plt.close()
 
-    def plot_cumulated_density_isosurface_2D(self, density_field, isodensity, plane='xy'):
+    def plot_cumulated_density_isosurface_2D(self, density_field, isodensity, plane='xy', show_atoms=False):
         print("Rendering 2D Cumulated Isosurface")
         if plane == 'xy':
-            projection = np.sum(density_field, axis=0)
-        elif plane == 'yz':
-            projection = np.sum(density_field, axis=1)
-        elif plane == 'xz':
             projection = np.sum(density_field, axis=2)
+        elif plane == 'yz':
+            projection = np.sum(density_field, axis=0)
+        elif plane == 'xz':
+            projection = np.sum(density_field, axis=1)
         else:
             raise ValueError("Plane must be 'xy', 'yz', or 'xz'")
 
@@ -126,32 +128,33 @@ class IsodensityPlotter:
 
 
         ax.set_title(f"Cumulated Isosurface at {isodensity} $e^-/a_0^3$ (p={plane})")
-        for atom in self.atoms:
-            atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
-            atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
-            atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
+        if show_atoms:
+            for atom in self.atoms:
+                atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
+                atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
+                atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
 
-            if plane == 'xy':
-                ax.scatter(atom_y, atom_z, color='red', s=50)
-            elif plane == 'yz':
-                ax.scatter(atom_x, atom_z, color='red', s=50)
-            elif plane == 'xz':
-                ax.scatter(atom_x, atom_y, color='red', s=50)
+                if plane == 'xy':
+                    ax.scatter(atom_x, atom_y, color='red', s=50)
+                elif plane == 'yz':
+                    ax.scatter(atom_y, atom_z, color='red', s=50)
+                elif plane == 'xz':
+                    ax.scatter(atom_x, atom_z, color='red', s=50)
 
         plt.savefig(os.path.join(self.output_dir, f"density_field_cumulated_isodensity_p{plane}_i{isodensity}.pdf"))
 
-    def plot_sliced_density_field_2D(self, density_field, slice_coord, plane='xy'):
+    def plot_sliced_density_field_2D(self, density_field, slice_coord, plane='xy', show_atoms=False):
         print("Rendering 2D Density Field Slice")
 
         if plane == 'xy':
             coord = self.from_space_coord_to_grid_coord(slice_coord, 'x')
-            projection = density_field[coord, :, :]
+            projection = density_field[:, :, coord]
         elif plane == 'yz':
             coord = self.from_space_coord_to_grid_coord(slice_coord, 'y')
-            projection = density_field[:, coord, :]
+            projection = density_field[coord, :, :]
         elif plane == 'xz':
             coord = self.from_space_coord_to_grid_coord(slice_coord, 'z')
-            projection = density_field[:, :, coord]
+            projection = density_field[:, coord, :]
         else:
             raise ValueError("Plane must be 'xy', 'yz', or 'xz'")
 
@@ -161,52 +164,53 @@ class IsodensityPlotter:
         fig.colorbar(cax, ax=ax)
 
 
-        for atom in self.atoms:
-            atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
-            atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
-            atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
+        if show_atoms:
+            for atom in self.atoms:
+                atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
+                atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
+                atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
 
-            if plane == 'xy':
-                ax.scatter(atom_y, atom_z, color='red', s=50)
-            elif plane == 'yz':
-                ax.scatter(atom_x, atom_z, color='red', s=50)
-            elif plane == 'xz':
-                ax.scatter(atom_x, atom_y, color='red', s=50)
+                if plane == 'xy':
+                    ax.scatter(atom_x, atom_y, color='red', s=50)
+                elif plane == 'yz':
+                    ax.scatter(atom_y, atom_z, color='red', s=50)
+                elif plane == 'xz':
+                    ax.scatter(atom_x, atom_z, color='red', s=50)
 
         plt.savefig(os.path.join(self.output_dir, f"density_field_slice_p{plane}_s{slice_coord}.pdf"))
 
-    def plot_sliced_density_isosurface_2D(self, density_field, isodensity, slice_coord, plane='xy'):
+    def plot_sliced_density_isosurface_2D(self, density_field, isodensity, slice_coord, plane='xy', show_atoms=False):
         print("Rendering 2D Density Field Slice Isosurface")
 
         if plane == 'xy':
             coord = self.from_space_coord_to_grid_coord(slice_coord, 'x')
-            projection = density_field[coord, :, :]
+            projection = density_field[:, :, coord]
         elif plane == 'yz':
             coord = self.from_space_coord_to_grid_coord(slice_coord, 'y')
-            projection = density_field[:, coord, :]
+            projection = density_field[coord, :, :]
         elif plane == 'xz':
             coord = self.from_space_coord_to_grid_coord(slice_coord, 'z')
-            projection = density_field[:, :, coord]
+            projection = density_field[:, coord, :]
         else:
             raise ValueError("Plane must be 'xy', 'yz', or 'xz'")
 
         fig, ax = plt.subplots()
         ax.set_title(f"Density field slice Isosurface at {isodensity} $e^-/a_0^3$ (p={plane}, s={slice_coord})")
-        for atom in self.atoms:
-            atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
-            atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
-            atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
+        if show_atoms:
+            for atom in self.atoms:
+                atom_x = self.from_space_coord_to_grid_coord(atom.position[0], 'x')
+                atom_y = self.from_space_coord_to_grid_coord(atom.position[1], 'y')
+                atom_z = self.from_space_coord_to_grid_coord(atom.position[2], 'z')
 
-            if plane == 'xy':
-                ax.scatter(atom_y, atom_z, color='red', s=50)
-            elif plane == 'yz':
-                ax.scatter(atom_x, atom_z, color='red', s=50)
-            elif plane == 'xz':
-                ax.scatter(atom_x, atom_y, color='red', s=50)
+                if plane == 'xy':
+                    ax.scatter(atom_x, atom_y, color='red', s=50)
+                elif plane == 'yz':
+                    ax.scatter(atom_y, atom_z, color='red', s=50)
+                elif plane == 'xz':
+                    ax.scatter(atom_x, atom_z, color='red', s=50)
 
         cax = ax.contour(projection.T, levels=[isodensity], colors='red')
         cax = ax.contourf(projection.T, 50, cmap='viridis', alpha=0.5)
         fig.colorbar(cax, ax=ax)
         
         plt.savefig(os.path.join(self.output_dir, f"density_field_slice_isodensity_p{plane}_s{slice_coord}_i{isodensity}.pdf"))
-
