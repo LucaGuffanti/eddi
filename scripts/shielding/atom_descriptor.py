@@ -4,7 +4,6 @@ from constants import *
 from utils.download_data import load_vdw_radii
 from config import *
 
-data = load_vdw_radii(vdw_radii_path=VDW_RADII_PATH, periodic_table_path=PERIODIC_TABLE_PATH, verbose=True)
 
 class AtomDescriptor:
     """
@@ -26,9 +25,9 @@ class AtomDescriptor:
         self.nuclear_radius = 0
         self.charge = 0
 
-        
-        self.vdw_radius = (data[self.atomic_number] / 100) * 1.8897259886
-        
+        self.vdw_radius = (data[self.atomic_number] / 100) * BOHRS_PER_ANGSTROMS
+                
+
 
     def radial_coordinate_density(self, radius):
         """

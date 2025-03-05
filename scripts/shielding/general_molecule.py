@@ -58,22 +58,25 @@ def polyatomic_molecule_density(atoms, x_range, y_range, z_range, mode='none', d
         return _no_cutoff_calculation(atoms, x, y, z)
 
 if __name__ == "__main__":
-    atom1 = AtomDescriptor(8, (0, 0, 0))
-    atom2 = AtomDescriptor(8, (0.5, 0, 0))
-    atom3 = AtomDescriptor(8, (0, 0.5, 0))
-    atoms = [atom1, atom2, atom3]
+    atom1 = AtomDescriptor(8, (-0.5, 0.5, 0))
+    atom2 = AtomDescriptor(8, (0.5, -0.5, 0))
+    atom3 = AtomDescriptor(8, (-0.5, -0.5, 0))
+    atom4 = AtomDescriptor(8, (0.5, 0.5, 0))
 
-    density_field = polyatomic_molecule_density(atoms, [-0.1, 1], [-0.1, 1], [-0.1, 1],  'none', 0.01, 0.01, 0.01,)
+    atoms = [atom1, atom2, atom3, atom4]
+
+    density_field = polyatomic_molecule_density(atoms, [-2, 2], [-2, 2], [-2, 2],  'none', 0.1, 0.1, 0.1)
 
     plotter = isodensity_plotter.IsodensityPlotter(
-        [-0.1, 1],
-        [-0.1, 1],
-        [-0.1, 1],
-        0.01,
-        0.01,
-        0.01,
+        [-2, 2],
+        [-2, 2],
+        [-2, 2],
+        0.1,
+        0.1,
+        0.1,
         atoms,
         os.path.join("output", "polyatomic")
     )
 
-    plotter.plot_sliced_density_field_2D(density_field, 0, 'xy')
+    # plotter.plot_sliced_isodensity_evolution_2D([density_field], ['density'], 0, 'xy', target_isodensity=10, factor=0.1) 
+    plotter.plot_isodensity_3D(density_field, 5)

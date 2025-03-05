@@ -37,3 +37,6 @@ HIGHEST_ENERGY_LEVEL = 5
 
 # Ordering of the orbitals as prescribed by Slater.
 SLATER_ORBITALS_ORDERING = np.array([(i, j) for i in range(HIGHEST_ENERGY_LEVEL + 1) for j in range(i)])
+
+# Number of Bohrs per Angstroms
+BOHRS_PER_ANGSTROMS = 1.8897259886
