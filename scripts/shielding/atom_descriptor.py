@@ -6,14 +6,13 @@ from utils.download_data import load_vdw_radii
 
 data = load_vdw_radii()
 
-
 class AtomDescriptor:
     """
     A class to describe an atom using its atomic number and position.
     It uses the Slater wave function to calculate the electron density.
     """
 
-    def __init__(self, atomic_number: int, position: tuple, charge: float=0):
+    def __init__(self, atomic_number: int, position: tuple, float= 0,charge: float=0):
         """
         Initialize the AtomDescriptor with an atomic number and position.
 
@@ -24,7 +23,9 @@ class AtomDescriptor:
         self.atomic_number = atomic_number
         self.position = np.array(position)
         self.slater_wf = SlaterWaveFunction(self.atomic_number)
+        self.nuclear_radius = 0
         self.charge = 0
+
         
         self.vdw_radius = (data[self.atomic_number] / 100) * 1.8897259886
         
@@ -39,6 +40,8 @@ class AtomDescriptor:
         Returns:
         float: The electron density at the given radius.
         """
+        if radius < self.nuclear_radius:
+            return 0
         return self.slater_wf.density(radius)
 
     def cartesian_coordinate_density(self, position):
@@ -53,4 +56,6 @@ class AtomDescriptor:
         """
         position = np.array(position)
         radius = np.linalg.norm(position - self.position)
+        if radius < self.nuclear_radius:
+            return 0
         return self.slater_wf.density(radius)
