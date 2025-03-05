@@ -171,7 +171,8 @@ class IsodensityPlotter:
         return np.take(density_field, coord, axis=axis)
 
 
-    def plot_sliced_isodensity_evolution_2D(self, fields, names, slice_coord, plane, target_isodensity=1.0, factor=0.01):
+    def plot_sliced_isodensity_evolution_2D(self, fields, names, slice_coord, plane, 
+                                            background_field_id=-1, target_isodensity=1.0, factor=0.01):
         """Generate a GIF showing the evolution of isodensities for each field in fields."""
         print("Rendering Isodensity Evolution GIF")
 
@@ -179,36 +180,65 @@ class IsodensityPlotter:
         ax.set_title(f"Isodensity Evolution (p={plane}, s={slice_coord}) [$e^-/a_0^3$]")
 
         colors = plt.cm.viridis(np.linspace(0, 1, len(fields)))
-
-        def update(frame):
-            for line in ax.lines:
-                line.remove()
-            ax.set_title(f"Isodensity Evolution (p={plane}, s={slice_coord}, i={frame}) [$e^-/a_0^3$]")
-            print(f"Current Isodensity: {frame}", end='\r')
-
-            proxies = []  
-            labels = []  
-
-            for i, density_field in enumerate(fields):
-                label = names[i] if names else f"Field {i+1}"
-                projection = self._get_slice(density_field, slice_coord, plane)
-
-                contours = measure.find_contours(projection.T, level=frame)
-                if contours:
-                    for contour in contours:
-                        ax.plot(contour[:, 1], contour[:, 0], color=colors[i])  # X and Y swapped
-
-                    proxies.append(plt.Line2D([0], [0], color=colors[i], lw=2))
-                    labels.append(label)
-
-            ax.legend(proxies, labels, loc='upper right')
-
-            return ax
-
         isodensity_levels = np.arange(0, target_isodensity + factor, factor)
+
+        projections = [self._get_slice(density_field, slice_coord, plane) for density_field in fields]
+        background_projection = projections[background_field_id] if background_field_id != -1 else None
+
+        if background_projection is not None:
+            cax = ax.contourf(background_projection.T, 50, cmap='gray', alpha=0.5)
+            fig.colorbar(cax, ax=ax)
+
+        proxies = [plt.Line2D([0], [0], color=colors[i], lw=2) for i in range(len(fields))]
+        labels = names if names else [f"Field {i+1}" for i in range(len(fields))]
+        ax.legend(proxies, labels, loc='upper right')
+
+        contour_lines = []
+        
+        def update(frame):
+            nonlocal contour_lines
+            
+            for line in contour_lines:
+                line.remove()
+            contour_lines = []
+
+            ax.set_title(f"Isodensity Evolution (p={plane}, s={slice_coord}, i={frame:.3f}) [$e^-/a_0^3$]")
+            print(f"Current Isodensity: {frame:.3f}", end='\r')
+
+            for i, projection in enumerate(projections):
+                contours = measure.find_contours(projection.T, level=frame)
+                for contour in contours:
+                    line, = ax.plot(contour[:, 1], contour[:, 0], color=colors[i])
+                    contour_lines.append(line)
+
+            return contour_lines
+
         ani = FuncAnimation(fig, update, frames=isodensity_levels, repeat=False)
 
         filename = f"isodensity_evolution_p{plane}_s{slice_coord}.gif"
+        os.makedirs(self.output_dir, exist_ok=True)  # Ensure output directory exists
         print("Saving GIF")
         ani.save(os.path.join(self.output_dir, filename), writer='imagemagick', fps=5)
+        plt.close()
+
+            
+
+    def plot_sliced_density_difference_2D(self, field_1, name_1, field_2, name_2, slice_coord, plane):
+        """Plot the absolute difference between two density fields as a 3D surface plot."""
+        
+        print("Rendering Density Difference")
+
+        difference = np.abs(field_1 - field_2)
+        projection = self._get_slice(difference, slice_coord, plane)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_title(f"Density Difference ({name_1} - {name_2}) (p={plane}, s={slice_coord}) [$e^-/a_0^3$]")
+        
+        X, Y = np.meshgrid(np.arange(projection.shape[0]), np.arange(projection.shape[1]))
+        ax.plot_surface(X, Y, projection.T, cmap='viridis', alpha=0.5)
+        fig.colorbar(ax.plot_surface(X, Y, projection.T, cmap='viridis', alpha=0.5), ax=ax)
+
+        filename = f"density_difference_{name_1}_{name_2}_p{plane}_s{slice_coord}.pdf"
+        plt.savefig(os.path.join(self.output_dir, filename))
         plt.close()
