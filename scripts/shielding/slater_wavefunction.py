@@ -61,6 +61,7 @@ class SlaterWaveFunction():
             self.radial_wave_functions.append(wf)
             self.density_functions.append(density)
 
+
         self.check_global_density()
 
     def construct_wavefunction(self, electron_configuration: str) -> tuple:
@@ -115,12 +116,14 @@ class SlaterWaveFunction():
                 print("       Will use theoretical normalization constant.")
             n_constant = norm_constant_theoretical
 
+        n_constant = n_constant / np.sqrt(4 * np.pi)
+        
         wf = lambda r: n_constant * r**(n_star - 1) * np.exp(-zeta * r)
         density = lambda r: n_e * (n_constant * r**(n_star - 1) * np.exp(-zeta * r))**2
 
         if self.verbose:
             print("----Density Wave function check----")
-        integral, _ = spi.quad(lambda r: density(r) * r**2, 0, np.inf)
+        integral, _ = spi.quad(lambda r: density(r) * r**2 * 4 * np.pi, 0, np.inf)
         if self.verbose:
             print(" ∫ρ(r)r^2dr  = ", integral)
             print(" n_e         = ", n_e)
@@ -137,7 +140,8 @@ class SlaterWaveFunction():
 
         computed_electrons = 0
         for density in self.density_functions:
-            integral, _ = spi.quad(lambda r: density(r) * r**2, 0, np.inf)
+            integral, _ = spi.quad(lambda r: 4*np.pi * density(r) * r**2, 0, np.inf)
+
             computed_electrons += integral
 
         if self.verbose:
@@ -167,9 +171,9 @@ class SlaterWaveFunction():
         """
         electrons = 0
         for density in self.density_functions:
-            integral, _ = spi.quad(lambda r: density(r) * r**2, 0, r)
+            integral, _ = spi.quad(lambda r: density(r) * r**2 * 4 * np.pi, 0, r)
             electrons += integral
-        return electrons
+        return electrons 
 
     def compute_density_in_interval(self, start: float, end: float, step: float) -> list:
         """Computes the electron density in an interval of distances from the nucleus.
@@ -261,7 +265,7 @@ class SlaterWaveFunction():
         for density in self.density_functions:
             res_dens = []
             for r in res_dist:
-                integral, _ = spi.quad(lambda r: density(r) * r**2, 0, r)
+                integral, _ = spi.quad(lambda r: density(r) * 4 * np.pi * r**2, 0, r)
                 res_dens.append(integral)
             res_matrix.append(res_dens)
         return (res_dist, res_matrix)
