@@ -4,7 +4,7 @@ from constants import *
 from utils.download_data import load_vdw_radii
 
 
-data = load_vdw_radii()
+data = load_vdw_radii(True)
 
 class AtomDescriptor:
     """

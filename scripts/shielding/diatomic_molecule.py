@@ -104,8 +104,7 @@ def main():
     plotter.plot_sliced_density_isosurface_2D(density_field, isodensity, 0, plane='xz')
     plotter.plot_sliced_density_isosurface_2D(density_field, isodensity, 0, plane='yz')
 
-    plotter.output_dir = 'output/diatomic_molecule/vdw_cutoff'
-    plotter.create_dir()
+    plotter.set_output_dir('output/diatomic_molecule/vdw_cutoff')
 
     density_field = diatomic_molecule_density(atom_1, atom_2, x_range, y_range, z_range, 'vdw', delta_x, delta_y, delta_z)
     isodensity = 2
