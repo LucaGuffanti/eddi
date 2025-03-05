@@ -2,7 +2,7 @@ import numpy as np
 from atom_descriptor import AtomDescriptor
 import tqdm
 
-class GaussianCubeReader:
+class GaussianCubeIO:
 
     def __init__ (self):
         self.atoms = []
@@ -91,9 +91,40 @@ class GaussianCubeReader:
         self.data.resize(self.npoints[0], self.npoints[1], self.npoints[2])
         print('Data shape: ', self.data.shape)
 
+    def write_file(self, filename):
+        print("Writing file:", filename)
+        with open(filename, 'w') as f:
+            self._write_header(f)
+            self._write_data(f)
+        print("Done writing file:", filename)
+
+    def _write_header(self, f):
+        f.write(" cube creation\n SCF Total Density\n")
+        f.write(f" {self.n_atoms} {self.origin[0]:.6f} {self.origin[1]:.6f} {self.origin[2]:.6f}\n")
+        f.write(f" {self.npoints[0]} {self.spacing[0]:.6f} 0.000000 0.000000\n")
+        f.write(f" {self.npoints[1]} 0.000000 {self.spacing[1]:.6f} 0.000000\n")
+        f.write(f" {self.npoints[2]} 0.000000 0.000000 {self.spacing[2]:.6f}\n")
+        for atom in self.atoms:
+            f.write(f" {atom.atomic_number} {atom.charge} {atom.position[0]:.6f} {atom.position[1]:.6f} {atom.position[2]:.6f}\n")
+
+    def _write_data(self, f):
+        x_points = self.npoints[0]
+        y_points = self.npoints[1]
+        z_points = self.npoints[2]
+
+        for i in range(x_points):
+            for j in range(y_points):
+                for k in range(z_points):
+                    f.write(f"{self.data[i, j, k]:.5E} ")
+                    if k % 6 == 5:
+                        f.write("\n")
+                f.write("\n")
+
 def main():
-    reader = GaussianCubeReader()
+    reader = GaussianCubeIO()
     reader.read('data/o2_3.554Angstr/o2.cube')
+    reader.write_file('output/my_file.cube')
+    reader.read('output/my_file.cube')
 
 if __name__ == '__main__':
     main()
