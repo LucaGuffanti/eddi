@@ -8,17 +8,18 @@ import os
 
 elements = []
 
-def download_periodic_table(verbose=False):
-    if not os.path.exists('scripts/shielding/utils/periodic_table.csv'):
+def download_periodic_table(verbose=False, periodic_table_path='utils/periodic_table.csv'):
+    if not os.path.exists(periodic_table_path):
         if verbose:
             print("Downloading periodic table data")
-        command = '''
-        pwd
-        cd utils/ &&
+        command = f'''
+        pwd &&
+        mkdir -p {os.path.dirname(periodic_table_path)} &&
+        cd {os.path.dirname(periodic_table_path)} &&
         wget https://gist.githubusercontent.com/GoodmanSciences/c2dd862cd38f21b0ad36b8f96b4bf1ee/raw/1d92663004489a5b6926e944c1b3d9ec5c40900e/Periodic%2520Table%2520of%2520Elements.csv &&
-        mv "Periodic Table of Elements".csv periodic_table.csv
-        sed -i 's/Wolfram/Tungsten/g' periodic_table.csv
-        sed -i 's/Cesium/Caesium/g' periodic_table.csv
+        mv "Periodic Table of Elements".csv {os.path.basename(periodic_table_path)}
+        sed -i 's/Wolfram/Tungsten/g' {os.path.basename(periodic_table_path)}
+        sed -i 's/Cesium/Caesium/g' {os.path.basename(periodic_table_path)}
         '''
 
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -30,11 +31,11 @@ def download_periodic_table(verbose=False):
             print(f"Error executing command: {stderr.decode().strip()}")
 
 
-def get_data(verbose=False):
+def get_data(verbose=False, periodic_table_path='utils/periodic_table.csv', vdw_radii_path='data/vdw_radii.csv'):
    
-    download_periodic_table(verbose)
+    download_periodic_table(verbose, periodic_table_path)
     
-    df = pd.read_csv('utils/periodic_table.csv')[['AtomicNumber','Element', 'Symbol']]
+    df = pd.read_csv(periodic_table_path)[['AtomicNumber','Element', 'Symbol']]
 
     pattern = re.compile(r'van der Waals radius</a>: \d+')
     alt_pattern = re.compile(r'van der Waals radius</a>: \[ \d+ \]')
@@ -80,18 +81,18 @@ def get_data(verbose=False):
 
     output_df = pd.DataFrame(elements)
     try:
-        os.mkdir("data/")
+        os.makedirs(os.path.dirname(vdw_radii_path), exist_ok=True)
     except FileExistsError:
         pass
 
-    output_df.to_csv('data/vdw_radii.csv', index=False)
+    output_df.to_csv(vdw_radii_path, index=False)
             
 
-def load_vdw_radii(verbose=False):
-    if not os.path.exists('data/vdw_radii.csv'):
-        get_data(verbose)
+def load_vdw_radii(vdw_radii_path='data/vdw_radii.csv', periodic_table_path='utils/periodic_table.csv', verbose=False):
+    if not os.path.exists(vdw_radii_path):
+        get_data(verbose, periodic_table_path, vdw_radii_path)
 
-    df = pd.read_csv('data/vdw_radii.csv')
+    df = pd.read_csv(vdw_radii_path)
     return df['vdwRadius'].to_list()
 
 def get_radii(verbose=False):

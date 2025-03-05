@@ -2,9 +2,9 @@ import numpy as np
 from slater_wavefunction import SlaterWaveFunction
 from constants import *
 from utils.download_data import load_vdw_radii
+from config import *
 
-
-data = load_vdw_radii(True)
+data = load_vdw_radii(vdw_radii_path=VDW_RADII_PATH, periodic_table_path=PERIODIC_TABLE_PATH, verbose=True)
 
 class AtomDescriptor:
     """
