@@ -38,9 +38,15 @@ def diatomic_molecule_density(atom_1, atom_2, x_range, y_range, z_range, mode='n
     """Computes the electron density field around a given diatomic molecule.
 
     Args:
-        atom_1 (_type_): First atomic species
-        atom_2 (_type_): Second atomic species
-        grid_refinement (float, optional): Distance of grid points. Defaults to 0.1.
+        atom_1 (AtomDescriptor): First atomic species
+        atom_2 (AtomDescriptor): Second atomic species
+        x_range (list): Range of x coordinates [min, max]
+        y_range (list): Range of y coordinates [min, max]
+        z_range (list): Range of z coordinates [min, max]
+        mode (str, optional): Calculation mode ('none' or 'vdw'). Defaults to 'none'.
+        delta_x (float, optional): Distance between grid points in x direction. Defaults to 0.1.
+        delta_y (float, optional): Distance between grid points in y direction. Defaults to 0.1.
+        delta_z (float, optional): Distance between grid points in z direction. Defaults to 0.1.
     """
 
     x = np.arange(x_range[0], x_range[1], delta_x)

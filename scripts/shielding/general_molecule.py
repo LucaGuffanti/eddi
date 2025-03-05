@@ -33,9 +33,14 @@ def polyatomic_molecule_density(atoms, x_range, y_range, z_range, mode='none', d
     """Computes the electron density field around a given polyatomic molecule.
 
     Args:
-        atom_1 (_type_): First atomic species
-        atom_2 (_type_): Second atomic species
-        grid_refinement (float, optional): Distance of grid points. Defaults to 0.1.
+        atoms (list): List of AtomDescriptor objects representing the atoms in the molecule.
+        x_range (tuple): Range of x coordinates (min, max).
+        y_range (tuple): Range of y coordinates (min, max).
+        z_range (tuple): Range of z coordinates (min, max).
+        mode (str, optional): Calculation mode ('none' or 'vdw'). Defaults to 'none'.
+        delta_x (float, optional): Step size for x coordinates. Defaults to 0.1.
+        delta_y (float, optional): Step size for y coordinates. Defaults to 0.1.
+        delta_z (float, optional): Step size for z coordinates. Defaults to 0.1.
     """
 
     x = np.arange(x_range[0], x_range[1], delta_x)
