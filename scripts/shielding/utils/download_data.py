@@ -8,8 +8,7 @@ import os
 
 elements = []
 
-def get_data(verbose=False):
-   
+def download_periodic_table(verbose=False):
     if not os.path.exists('scripts/shielding/utils/periodic_table.csv'):
         if verbose:
             print("Downloading periodic table data")
@@ -30,6 +29,11 @@ def get_data(verbose=False):
         elif verbose:
             print(f"Error executing command: {stderr.decode().strip()}")
 
+
+def get_data(verbose=False):
+   
+    download_periodic_table(verbose)
+    
     df = pd.read_csv('utils/periodic_table.csv')[['AtomicNumber','Element', 'Symbol']]
 
     pattern = re.compile(r'van der Waals radius</a>: \d+')
@@ -89,6 +93,26 @@ def load_vdw_radii(verbose=False):
 
     df = pd.read_csv('data/vdw_radii.csv')
     return df['vdwRadius'].to_list()
+
+def get_radii(verbose=False):
+
+    download_periodic_table()
+
+    # TODO: find the website containing all the nuclear radii
+    # In order to parse the website response
+
+    # Build a http request
+
+    # Apply the necessary regex
+
+    # Store data in a csv
+
+def load_nuclear_radii(verbose=False):
+    if not os.path.exists('data/nuclear_radii.csv'):
+        get_radii(verbose)
+    
+    df = pd.read_csv('data/nuclear_radii.csv')
+    return df['nuclearRadius']
 
 if __name__ == "__main__":
     get_data(verbose=True)
