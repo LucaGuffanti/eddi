@@ -24,6 +24,22 @@ def _vdw_calculation(atom_1, atom_2, x, y, z):
 
     return density_field
 
+def _2vdw_calculation(atom_1, atom_2, x, y, z):
+    density_field = np.zeros((len(x), len(y), len(z)))
+    for i, x_val in tqdm.tqdm(enumerate(x), total=len(x), desc='Computing density field'):
+        for j, y_val in enumerate(y):
+            for k, z_val in enumerate(z):
+                pos = (x_val, y_val, z_val)
+                radius_1 = np.linalg.norm(np.array(pos) - atom_1.position)
+                radius_2 = np.linalg.norm(np.array(pos) - atom_2.position)
+                if radius_1 <= 2*atom_1.vdw_radius:
+                    density_field[i, j, k] += atom_1.radial_coordinate_density(radius_1)
+                if radius_2 <= 2*atom_2.vdw_radius:
+                    density_field[i, j, k] += atom_2.radial_coordinate_density(radius_2)
+                    
+
+    return density_field
+
 def _no_cutoff_calculation(atom_1, atom_2, x, y, z):
     density_field = np.zeros((len(x), len(y), len(z)))
     for i, x_val in tqdm.tqdm(enumerate(x), total=len(x), desc='Computing density field'):
@@ -59,6 +75,11 @@ def diatomic_molecule_density(atom_1, atom_2, x_range, y_range, z_range, mode='n
         print("Atom:", atom_1.atomic_number, "Radius:", atom_1.vdw_radius)
         print("Atom:", atom_2.atomic_number, "Radius:", atom_2.vdw_radius)
         return _vdw_calculation(atom_1, atom_2, x, y, z)
+    elif mode == '2vdw':
+        print("Using 2*Van-der-Waals cutoff Radii")
+        print("Atom:", atom_1.atomic_number, "Radius:", atom_1.vdw_radius)
+        print("Atom:", atom_2.atomic_number, "Radius:", atom_2.vdw_radius)
+        return _2vdw_calculation(atom_1, atom_2, x, y, z)
     else:
         print("No cutoff radii")
         return _no_cutoff_calculation(atom_1, atom_2, x, y, z)
@@ -139,6 +160,7 @@ def time_computation():
     no_cutoff = [] 
     cutoff = []
     sizes = []
+    vdw2 = []
 
     delta_x = 0.1
     delta_y = 0.1
@@ -167,14 +189,20 @@ def time_computation():
         end_cutoff = time.time()
         cutoff.append(end_cutoff - start_cutoff)
 
+        start_2_vdw = time.time()
+        density_field = diatomic_molecule_density(atom_1, atom_2, x_range, y_range, z_range, '2vdw', delta_x, delta_y, delta_z)
+        end_2_vdw = time.time()
+        vdw2.append(end_2_vdw - start_2_vdw)
+
+
     with open('output/density_computation_times.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(['GridSize', 'NoCutoffTime', 'CutoffTime'])
-        for size, no_cutoff_time, cutoff_time in zip(sizes, no_cutoff, cutoff):
-            writer.writerow([size, no_cutoff_time, cutoff_time])
-    plot_timings.plot_density_computation(sizes, cutoff, no_cutoff)
+        writer.writerow(['GridSize', 'NoCutoffTime', 'CutoffTime', '2Vdw'])
+        for size, no_cutoff_time, cutoff_time, vdw2_time in zip(sizes, no_cutoff, cutoff, vdw2):
+            writer.writerow([size, no_cutoff_time, cutoff_time, vdw2_time])
+    plot_timings.plot_density_computation(sizes, [no_cutoff, cutoff, vdw2], ['No Cutoff', 'vdw', '2vdw'])
 
 
 if __name__ == "__main__":
-    # time_computation()
-    main()
+    time_computation()
+    # main()

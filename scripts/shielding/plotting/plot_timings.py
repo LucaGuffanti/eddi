@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 
-def plot_density_computation(sizes, with_cutoff, without_cutoff):
-    plt.plot(sizes, with_cutoff, label='With Cutoff', marker='o', linewidth=2)
-    plt.plot(sizes, without_cutoff, label='Without Cutoff', marker='s', linewidth=2)
+def plot_density_computation(sizes, timings, labels):
+    for label, timing in zip(labels, timings):
+        plt.plot(sizes, timing, label=label, marker='o', linewidth=2)
     plt.xlabel('Total grid points')
     plt.ylabel('Time [$s$]')
-    plt.title('Comparison between no cutoff and VdW-based cutoff')
+    plt.title('Comparison of different timings')
     plt.xticks(sizes)
     plt.xscale('log')
     plt.legend()

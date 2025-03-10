@@ -7,6 +7,7 @@ import plotting.plot_densities as plot_densities
 import plotting.plot_electrons as plot_electrons
 import plotting.plot_radii as plot_radii
 import utils.download_data as download_data
+import config 
 
 def create_output_directory():
     try:
@@ -117,7 +118,7 @@ def process_density_cutoff_based_atomic_radius(z, cutoff_density):
         DENSITY_CUTOFF_BASED_ELECTRONS.append(wf.electrons(possible_radius))
             
 
-VDW_BASED_RADII_PM = download_data.load_vdw_radii(True)
+VDW_BASED_RADII_PM = config.data
 VDW_BASED_RADII_BOHRS = [(radius / BOHR_RADIUS_ANGSTROMS) / 100 for radius in VDW_BASED_RADII_PM]
 VDW_BASED_DENSITIES = []
 VDW_BASED_ELECTRONS = []
@@ -201,6 +202,14 @@ if __name__ == "__main__":
     process_vdw_based_atomic_radius()
 
     plot_radii.plot_all(
+        {
+            'bohr': [BOHR_BASED_RADII, BOHR_BASED_DENSITIES, BOHR_BASED_ELECTRONS],
+            'vdw' : [VDW_BASED_RADII_BOHRS, VDW_BASED_DENSITIES, VDW_BASED_ELECTRONS],
+            'density': [DENSITY_CUTOFF_BASED_RADII, DENSITY_CUTOFF_BASED_DENSITIES, DENSITY_CUTOFF_BASED_ELECTRONS, DENSITY_CUTOFF_BASED_TARGET_DENSITY]
+        }
+    )
+
+    plot_radii.plot_comparison_separated(
         {
             'bohr': [BOHR_BASED_RADII, BOHR_BASED_DENSITIES, BOHR_BASED_ELECTRONS],
             'vdw' : [VDW_BASED_RADII_BOHRS, VDW_BASED_DENSITIES, VDW_BASED_ELECTRONS],

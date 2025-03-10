@@ -18,6 +18,19 @@ def _vdw_calculation(atoms, x, y, z):
 
     return density_field
 
+def _2_vdw_calculation(atoms, x, y, z):
+    density_field = np.zeros((len(x), len(y), len(z)))
+    for i, x_val in tqdm.tqdm(enumerate(x), total=len(x), desc='Computing density field'):
+        for j, y_val in enumerate(y):
+            for k, z_val in enumerate(z):
+                pos = (x_val, y_val, z_val)
+                for atom in atoms:
+                    radius = np.linalg.norm(np.array(pos) - atom.position)
+                    if radius <= 2*atom.vdw_radius:
+                        density_field[i, j, k] += atom.radial_coordinate_density(radius)    
+
+    return density_field
+
 def _no_cutoff_calculation(atoms, x, y, z):
     density_field = np.zeros((len(x), len(y), len(z)))
     for i, x_val in tqdm.tqdm(enumerate(x), total=len(x), desc='Computing density field'):
@@ -53,6 +66,11 @@ def polyatomic_molecule_density(atoms, x_range, y_range, z_range, mode='none', d
         for atom in atoms:
             print("Atom:", atom.atomic_number, "Radius:", atom.vdw_radius)
         return _vdw_calculation(atoms, x, y, z)
+    elif mode == '2vdw':
+        print("Using 2*Van-der-Waals cutoff Radii")
+        for atom in atoms:
+            print("Atom:", atom.atomic_number, "Radius:", atom.vdw_radius)
+        return _2_vdw_calculation(atoms, x, y, z)
     else:
         print("No cutoff radii")
         return _no_cutoff_calculation(atoms, x, y, z)
@@ -65,12 +83,15 @@ if __name__ == "__main__":
 
     atoms = [atom1, atom2, atom3, atom4]
 
-    density_field = polyatomic_molecule_density(atoms, [-2, 2], [-2, 2], [-2, 2],  'none', 0.1, 0.1, 0.1)
+    density_field = polyatomic_molecule_density(atoms, [-4, 4], [-4, 4], [-4, 4],  'none', 0.1, 0.1, 0.1)
+    density_field_2 = polyatomic_molecule_density(atoms, [-4, 4], [-4, 4], [-4, 4],  'vdw', 0.1, 0.1, 0.1)
+    density_field_3 = polyatomic_molecule_density(atoms, [-4, 4], [-4, 4], [-4, 4],  '2vdw', 0.1, 0.1, 0.1)
+
 
     plotter = isodensity_plotter.IsodensityPlotter(
-        [-2, 2],
-        [-2, 2],
-        [-2, 2],
+        [-4, 4],
+        [-4, 4],
+        [-4, 4],
         0.1,
         0.1,
         0.1,
@@ -79,4 +100,4 @@ if __name__ == "__main__":
     )
 
     # plotter.plot_sliced_isodensity_evolution_2D([density_field], ['density'], 0, 'xy', target_isodensity=10, factor=0.1) 
-    plotter.plot_isodensity_3D(density_field, 5)
+    plotter.plot_sliced_isodensity_evolution_2D([density_field, density_field_2, density_field_3], ['no cutoff', 'vdw', '2vdw'], 0, 'xy', target_isodensity=2, factor=0.01, store_every=10, background_field_id=0)

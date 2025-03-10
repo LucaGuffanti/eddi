@@ -78,6 +78,10 @@ class IsodensityPlotter:
         """Generate and save a rotating 3D animation."""
         def rotate(angle):
             ax.view_init(azim=angle)
+            print(angle)
+            if angle % 30 == 0:
+                filename = f"frame_{angle}.png"
+                fig.savefig(os.path.join(self.output_dir, filename))
 
         angles = np.arange(0, 360, 10)
         ani = FuncAnimation(fig, rotate, frames=angles, interval=50)
@@ -124,7 +128,7 @@ class IsodensityPlotter:
 
         fig, ax = plt.subplots()
         ax.set_title(f"Density field slice (p={plane}, s={slice_coord}) [$e^-/a_0^3$]")
-        cax = ax.contourf(projection.T, 50, cmap='viridis', alpha=0.5)
+        cax = ax.contourf(projection.T, 100, cmap='viridis', alpha=0.5)
         fig.colorbar(cax, ax=ax)
 
         if show_atoms:
@@ -142,8 +146,8 @@ class IsodensityPlotter:
 
         fig, ax = plt.subplots()
         ax.set_title(f"Isosurface slice (p={plane}, s={slice_coord}, i={isodensity}) [$e^-/a_0^3$]")
-        ax.contour(projection.T, levels=[isodensity], colors='red')
-        cax = ax.contourf(projection.T, 50, cmap='viridis', alpha=0.5)
+        ax.contour(projection.T, levels=[isodensity], colors='yellow')
+        cax = ax.contourf(projection.T, 50, cmap='gray', alpha=0.5)
         fig.colorbar(cax, ax=ax)
 
         if show_atoms:
@@ -162,7 +166,7 @@ class IsodensityPlotter:
 
     def _get_slice(self, density_field, slice_coord, plane):
         """Return a 2D slice of the density field at the given coordinate along the specified plane."""
-        slices = {'xy': ('x', 2), 'yz': ('y', 0), 'xz': ('z', 1)}
+        slices = {'xy': ('z', 2), 'yz': ('x', 0), 'xz': ('y', 1)}
         if plane not in slices:
             raise ValueError("Plane must be 'xy', 'yz', or 'xz'")
 
@@ -172,7 +176,7 @@ class IsodensityPlotter:
 
 
     def plot_sliced_isodensity_evolution_2D(self, fields, names, slice_coord, plane, 
-                                            background_field_id=-1, target_isodensity=1.0, factor=0.01):
+                                            background_field_id=-1, target_isodensity=1.0, factor=0.01, store_every=-1, show_atoms=False):
         """Generate a GIF showing the evolution of isodensities for each field in fields."""
         print("Rendering Isodensity Evolution GIF")
 
@@ -210,6 +214,13 @@ class IsodensityPlotter:
                 for contour in contours:
                     line, = ax.plot(contour[:, 1], contour[:, 0], color=colors[i])
                     contour_lines.append(line)
+
+            if show_atoms:
+                self._plot_atoms(ax, plane)
+
+            if store_every > 0 and int(frame / factor) % store_every == 0:
+                filename = f"isodensity_evolution_p{plane}_s{slice_coord}_i{frame:.3f}.png"
+                plt.savefig(os.path.join(self.output_dir, filename))
 
             return contour_lines
 

@@ -78,7 +78,7 @@ class SlaterWaveFunction():
         if self.verbose:
             print("=== Constructing wavefunction for :", electron_configuration[0][1],",",electron_configuration[0][2], "===")
         
-        n_star = int(electron_configuration[0][2][0])
+        n_star = SLATER_PRINCIPAL_QUANTUM_NUMBER[int(electron_configuration[0][2][0])]
         zeta   = electron_configuration[1][3]
         n_e    = electron_configuration[1][0]
 
@@ -98,23 +98,10 @@ class SlaterWaveFunction():
         if self.verbose:
             print(" ∫Ψ*(r)Ψ(r)r^2dr = ", integral)
         norm_constant_computed = 1 / np.sqrt(integral)
-        norm_constant_theoretical = (2 * zeta) ** (n_star + 0.5) / np.sqrt(math.factorial(2 * n_star))
-        if self.verbose:
-            print(" Th. N           = ", norm_constant_theoretical)
-            print(" Compt. N        = ", norm_constant_computed)
-            print(" Error      |e|  = ", abs(norm_constant_theoretical - norm_constant_computed))
-            print(" check: |e| < ε_n ?  = ", abs(norm_constant_theoretical - norm_constant_computed) < self.norm_epsilon)
+        # norm_constant_theoretical = (2 * zeta) ** (n_star + 0.5) / np.sqrt(math.factorial(2 * n_star))
         
-        n_constant = 0
-        if (abs(norm_constant_theoretical - norm_constant_computed) < self.norm_epsilon):
-            if self.verbose:
-                print("    -> Will use computed normalization constant.")
-            n_constant = norm_constant_computed
-        else:
-            if self.verbose:
-                print("    -> !!!Large error. Check calculations!!!")
-                print("       Will use theoretical normalization constant.")
-            n_constant = norm_constant_theoretical
+        n_constant = norm_constant_computed
+
 
         n_constant = n_constant / np.sqrt(4 * np.pi)
         

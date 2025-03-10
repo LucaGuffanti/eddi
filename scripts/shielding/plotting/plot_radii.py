@@ -105,4 +105,32 @@ def plot_all(data_dict):
 
     plt.savefig("output/radii/comparison.pdf")
 
+def plot_comparison_separated(data_dict):
+    bohr_data = data_dict['bohr']
+    vdw_data = data_dict['vdw']
+    density_data = data_dict['density']
 
+    Z = np.arange(1, len(bohr_data[0]) + 1)
+    periods = [1, 3, 11, 19, 37, 55, 87]  # Starting atomic numbers of new periods
+    colors = ['lightgrey', 'lightblue', 'lightgreen', 'lightyellow', 'lightpink', 'lightcoral', 'lightcyan']
+
+    titles = ['Atomic radius [$a_0$]', 'Electron density at Atomic Radius [$e^-/a_0^3$]', 'Enclosed electrons at Atomic Radius']
+    y_labels = ['Radius [$a_0$]', 'Density [$e^-/a_0^3$]', 'Electrons']
+
+    for i, title in enumerate(titles):
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.plot(Z, bohr_data[i], label="Bohr", linewidth=2, alpha=0.7, marker='o')
+        ax.plot(Z, density_data[i], label=f"Density {density_data[3]}", linewidth=2, alpha=0.7, marker='s')
+        ax.plot(Z, vdw_data[i], label="VDW", linewidth=2, alpha=0.7, marker='*')
+        ax.set_title(title)
+        ax.set_xlabel("Atomic number")
+        ax.set_ylabel(y_labels[i])
+
+        for j, period in enumerate(periods):
+            if period <= len(bohr_data[i]):
+                if j < len(periods) - 1:
+                    ax.axvspan(period, min(periods[j + 1]-1, len(bohr_data[i])-1), facecolor=colors[j], alpha=0.2)
+                else:
+                    ax.axvspan(period, len(bohr_data[i]), facecolor=colors[j], alpha=0.2)
+        ax.legend()
+        plt.savefig(f"output/radii/comparison_{i}.pdf")
