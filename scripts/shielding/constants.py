@@ -40,3 +40,15 @@ SLATER_ORBITALS_ORDERING = np.array([(i, j) for i in range(HIGHEST_ENERGY_LEVEL 
 
 # Number of Bohrs per Angstroms
 BOHRS_PER_ANGSTROMS = 1.8897259886
+
+AMBER_RADII_ANGSTROMS = {
+    1 : 1.4870, # H
+    6 : 1.9080, # C
+    7 : 1.8240, # N
+    8 : 1.6612, # O
+    16 : 2.0000 # S
+}
+
+AMBER_RADII_BOHRS = {k : v * BOHRS_PER_ANGSTROMS for k, v in AMBER_RADII_ANGSTROMS.items()}
+
+PM_TO_ANGSTROMS = 1e-2

@@ -134,3 +134,29 @@ def plot_comparison_separated(data_dict):
                     ax.axvspan(period, len(bohr_data[i]), facecolor=colors[j], alpha=0.2)
         ax.legend()
         plt.savefig(f"output/radii/comparison_{i}.pdf")
+
+def plot_amber(amber_radii_densities, vdw_radii_densities, symbols):
+    fig, ax = plt.subplots()
+
+    atomic_numbers = [i for i in range(len(amber_radii_densities))]
+    ax.plot(atomic_numbers, amber_radii_densities, linestyle='--', color='blue', marker='o', label='Densities at AMBER radii', alpha=0.7, linewidth=1)
+    ax.plot(atomic_numbers, vdw_radii_densities, linestyle='--', color='red', marker='s', label='Densities at VDW radii', alpha=0.7, linewidth=1)
+    plt.xlabel("Atomic number")
+    plt.ylabel("Density [$e^-/a_0^3$]")
+    plt.title("Comparison of AMBER radii and Slater Wave Function densities")
+    ax.set_xticks(atomic_numbers)  # Ensure this is a list of specific atomic numbers you want to display
+    ax.set_xticklabels(symbols)
+    ax.grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.5) 
+    for i, txt in enumerate(amber_radii_densities):
+        ax.annotate(f'{txt:.4e}', (atomic_numbers[i], amber_radii_densities[i]), textcoords="offset points", xytext=(0,10), ha='center', fontsize=8, color='blue',
+                    bbox=dict(boxstyle="round,pad=0.3", edgecolor='none', facecolor='white', alpha=0.2))
+
+    for i, txt in enumerate(vdw_radii_densities):
+        ax.annotate(f'{txt:.4e}', (atomic_numbers[i], vdw_radii_densities[i]), textcoords="offset points", xytext=(0,-15), ha='center', fontsize=8, color='red',
+                    bbox=dict(boxstyle="round,pad=0.3", edgecolor='none', facecolor='white', alpha=0.2))
+    ax.legend()
+    ax.set_xlim([-0.5, len(atomic_numbers)-0.5])
+    ax.set_ylim([0, max(max(amber_radii_densities), max(vdw_radii_densities))*1.1])
+    
+    plt.savefig("output/radii/amber_comparison.pdf")
+    plt.show()
