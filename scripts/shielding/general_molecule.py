@@ -4,46 +4,26 @@ import plotting.isodensity_plotter as isodensity_plotter
 import plotting.plot_timings as plot_timings
 import tqdm
 import os
-from multiprocessing import Pool
+from joblib import Parallel, delayed
+from numba import njit
 
-def _vdw_calculation(atoms, x, y, z):
-    density_field = np.zeros((len(x), len(y), len(z)))
-    for i, x_val in tqdm.tqdm(enumerate(x), total=len(x), desc='Computing density field'):
-        for j, y_val in enumerate(y):
-            for k, z_val in enumerate(z):
-                pos = (x_val, y_val, z_val)
-                for atom in atoms:
-                    radius = np.linalg.norm(np.array(pos) - atom.position)
-                    if radius <= atom.vdw_radius:
-                        density_field[i, j, k] += atom.radial_coordinate_density(radius)    
+def compute_density(x, y, z, atoms, mode='none'):
+    density = 0.0
+    for atom in atoms:
+        if mode == 'vdw':
+            radius = np.linalg.norm(np.array([x, y, z]) - atom.position)
+            if radius <= atom.vdw_radius:
+                density += atom.radial_coordinate_density(radius)
+        elif mode == '2vdw':
+            radius = np.linalg.norm(np.array([x, y, z]) - atom.position)
+            if radius <= 2*atom.vdw_radius:
+                density += atom.radial_coordinate_density(radius)
+        else:
+            density += atom.cartesian_coordinate_density((x, y, z))
+    return density
 
-    return density_field
 
-def _2_vdw_calculation(atoms, x, y, z):
-    density_field = np.zeros((len(x), len(y), len(z)))
-    for i, x_val in tqdm.tqdm(enumerate(x), total=len(x), desc='Computing density field'):
-        for j, y_val in enumerate(y):
-            for k, z_val in enumerate(z):
-                pos = (x_val, y_val, z_val)
-                for atom in atoms:
-                    radius = np.linalg.norm(np.array(pos) - atom.position)
-                    if radius <= 2*atom.vdw_radius:
-                        density_field[i, j, k] += atom.radial_coordinate_density(radius)    
-
-    return density_field
-
-def _no_cutoff_calculation(atoms, x, y, z):
-    density_field = np.zeros((len(x), len(y), len(z)))
-    for i, x_val in tqdm.tqdm(enumerate(x), total=len(x), desc='Computing density field'):
-        for j, y_val in enumerate(y):
-            for k, z_val in enumerate(z):
-                pos = (x_val, y_val, z_val)
-                for atom in atoms:
-                    density_field[i, j, k] += atom.cartesian_coordinate_density(pos)
-
-    return density_field
-
-def polyatomic_molecule_density(atoms, x_range, y_range, z_range, mode='none', delta_x=0.1, delta_y=0.1, delta_z=0.1):
+def polyatomic_molecule_density(atoms, x_range, y_range, z_range, mode='none', delta_x=0.1, delta_y=0.1, delta_z=0.1, jobs=-1):
     """Computes the electron density field around a given polyatomic molecule.
 
     Args:
@@ -66,15 +46,28 @@ def polyatomic_molecule_density(atoms, x_range, y_range, z_range, mode='none', d
         print("Using Van-der-Waals cutoff Radii")
         for atom in atoms:
             print("Atom:", atom.atomic_number, "Radius:", atom.vdw_radius)
-        return _vdw_calculation(atoms, x, y, z)
     elif mode == '2vdw':
         print("Using 2*Van-der-Waals cutoff Radii")
         for atom in atoms:
             print("Atom:", atom.atomic_number, "Radius:", atom.vdw_radius)
-        return _2_vdw_calculation(atoms, x, y, z)
     else:
         print("No cutoff radii")
-        return _no_cutoff_calculation(atoms, x, y, z)
+
+    density = np.zeros((len(x), len(y), len(z)))
+
+    def compute_for_x_axis(idx, x):
+        slice = np.zeros((len(y), len(z)))
+        for j, y_val in enumerate(y):
+            for k, z_val in enumerate(z):
+                slice[j, k] = compute_density(x, y_val, z_val, atoms, mode)
+        return idx, slice
+    
+    res = Parallel(n_jobs=jobs)(delayed(compute_for_x_axis)(idx, x_val) for idx, x_val in tqdm.tqdm(enumerate(x), total=len(x), desc="Computing density slices"))
+
+
+    for i, slice in res:
+        density[i, :, :] = slice
+    return density
 
 if __name__ == "__main__":
     atom1 = AtomDescriptor(8, (-0.5, 0.5, 0))
