@@ -4,6 +4,7 @@ import plotting.isodensity_plotter as isodensity_plotter
 import plotting.plot_timings as plot_timings
 import tqdm
 import os
+from multiprocessing import Pool
 
 def _vdw_calculation(atoms, x, y, z):
     density_field = np.zeros((len(x), len(y), len(z)))
@@ -38,7 +39,7 @@ def _no_cutoff_calculation(atoms, x, y, z):
             for k, z_val in enumerate(z):
                 pos = (x_val, y_val, z_val)
                 for atom in atoms:
-                    density_field[i, j, k] += atom.cartesian_coordinate_density(pos) + atom.cartesian_coordinate_density(pos)
+                    density_field[i, j, k] += atom.cartesian_coordinate_density(pos)
 
     return density_field
 
