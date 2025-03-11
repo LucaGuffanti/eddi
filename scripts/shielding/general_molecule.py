@@ -5,7 +5,6 @@ import plotting.plot_timings as plot_timings
 import tqdm
 import os
 from joblib import Parallel, delayed
-from numba import njit
 
 def compute_density(x, y, z, atoms, mode='none'):
     density = 0.0
