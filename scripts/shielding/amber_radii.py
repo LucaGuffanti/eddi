@@ -33,5 +33,6 @@ for (atomic_number, radius) in amber_radii.items():
 
 plot_amber(amber_radii_densities, vdw_radii_densities, actual_symbols)
     
+print("Average Isodensity for C-N-O", np.mean(amber_radii_densities[1:3]))
     
 

@@ -6,7 +6,7 @@ from gaussian_cube_io import GaussianCubeIO
 
 reader = PDBReader()
 # change with actual path
-reader.read_file('PATH_TO_ALANINE')
+reader.read_file('data/ala.pdb')
 
 atoms = reader.atoms
 
@@ -27,17 +27,15 @@ print(f"x_min: {x_min}, x_max: {x_max}")
 print(f"y_min: {y_min}, y_max: {y_max}")
 print(f"z_min: {z_min}, z_max: {z_max}")
 
-x_range = [x_min - 2, x_max + 2]
-y_range = [y_min - 2, y_max + 2]
-z_range = [z_min - 4, z_max + 4]
+x_range = [x_min - 5, x_max + 5]
+y_range = [y_min - 5, y_max + 5]
+z_range = [z_min - 5, z_max + 5]
 
 density_field = polyatomic_molecule_density(atoms, x_range, y_range, z_range, 'none', delta_x, delta_y, delta_z)
 
 plotter = IsodensityPlotter(
     x_range, y_range, z_range, delta_x, delta_y, delta_z, atoms, 'output/alanine'
 )
-
-# plotter.plot_isodensity_3D(density_field, 0.1)
 
 cube_io = GaussianCubeIO()
 cube_io.spacing = (delta_x, delta_y, delta_z)
