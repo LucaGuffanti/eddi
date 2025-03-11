@@ -34,12 +34,12 @@ class PDBReader:
                         hcount += 1
 
                     number = atomic_table[(atomic_table['Symbol']) == components[-1]]['AtomicNumber'].values[0]   
-                    px = float(components[6]) * BOHRS_PER_ANGSTROMS
-                    py = float(components[7]) * BOHRS_PER_ANGSTROMS
-                    pz = float(components[8]) * BOHRS_PER_ANGSTROMS
+                    px = float(components[5]) * BOHRS_PER_ANGSTROMS
+                    py = float(components[6]) * BOHRS_PER_ANGSTROMS
+                    pz = float(components[7]) * BOHRS_PER_ANGSTROMS
 
                     if self.verbose:
-                        print(f"{components[-1]}, Z: {number}, (x, y, z): ({px}, {py}, {pz})")
+                        print(f"{components[-1]}, Z: {number}, (x, y, z): ({px/BOHRS_PER_ANGSTROMS}, {py/BOHRS_PER_ANGSTROMS}, {pz/BOHRS_PER_ANGSTROMS})")
 
                     self.atoms.append(
                         AtomDescriptor(
