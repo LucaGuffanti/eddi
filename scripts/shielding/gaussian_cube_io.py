@@ -1,6 +1,7 @@
 import numpy as np
 from atom_descriptor import AtomDescriptor
 import tqdm
+import os
 
 class GaussianCubeIO:
 
@@ -10,8 +11,15 @@ class GaussianCubeIO:
         self.origin = None
         self.npoints = None
         self.spacing = None
-        self.filename = None
+        self.data = None
         self.current_line = 0
+
+        self.x_range = None
+        self.y_range = None
+        self.z_range = None
+
+        self.filename = None
+
 
     def read (self, filename):
         self.filename = filename
@@ -23,6 +31,11 @@ class GaussianCubeIO:
             self.read_data(lines)
 
         print('Done reading file: ', filename)
+
+        self.x_range = [self.origin[0], self.origin[0] + self.spacing[0] * self.npoints[0]]
+        self.y_range = [self.origin[1], self.origin[1] + self.spacing[1] * self.npoints[1]]
+        self.z_range = [self.origin[2], self.origin[2] + self.spacing[2] * self.npoints[2]]
+        
     
     def read_header(self, lines):
         print("Reading header")
@@ -93,6 +106,7 @@ class GaussianCubeIO:
 
     def write_file(self, filename):
         print("Writing file:", filename)
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
         with open(filename, 'w') as f:
             self._write_header(f)
             self._write_data(f)
