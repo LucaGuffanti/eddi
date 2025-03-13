@@ -100,42 +100,34 @@ typedef struct {
 } eddi_density_field_descriptor_t;
 
 /**
- * @brief Descriptor of an atom. 
+ * @brief Descriptor of a molecule (Structure of Arrays).
  */
 typedef struct {
-    /**
-     * @brief Position of the atom in 3D in units of Bohrs. 
-     */
-    eddi_point_t position;
 
     /**
-     * @brief Atomic number. 
+     * @brief x coordinates of the atoms.
      */
-    eddi_atomic_number_t atomic_number;
+    eddi_real_t* atoms_x;
 
     /**
-     * @brief Position Wavefuntion, as a function pointer, taking a position expressed in 
-     * spherical coordinates as an input
+     * @brief y coordinates of the atoms.
      */
-    eddi_real_t (* position_wavefunction)(double, double, double);
+    eddi_real_t* atoms_y;
+
+    /**
+     * @brief z coordinates of the atoms.
+     */
+    eddi_real_t* atoms_z;
+
+    /**
+     * @brief density functions of the atoms.
+     */
+    eddi_real_t (**density)(double, double, double);
     
-    
     /**
-     * @brief Electron Density function, as a function pointer 
-     * taking a position expressed in spherical coordinates as an input
+     * @brief List of atomic numbers;
      */
-    eddi_real_t (* electron_density_function)(double, double, double);
-
-} eddi_atom_descriptor_t;
-
-/**
- * @brief Descriptor of an atom.
- */
-typedef struct {
-    /**
-     * @brief List of atom descriptors.
-     */
-    eddi_atom_descriptor_t* atoms;
+    eddi_atomic_number_t* atomic_numbers;
 
     /**
      * @brief Number of atoms in the molecule.

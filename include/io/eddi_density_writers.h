@@ -1,5 +1,5 @@
 /**
- * @file eddi_density_writers.h
+ * @file density_writers.h
  * @author Luca Guffanti
  * @brief Contains function prototypes for writing density fields to different file formats
  */
@@ -38,7 +38,7 @@ bool eddi_write_binary(const char* filename, const eddi_density_field_descriptor
  * @return true if the file is written successfully
  * @return false if any problem occurs during the writing operation.
  */
-bool eddi_write_gaussian_cube(const char* filename, const eddi_density_field_descriptor_t* density_field_descriptor, const eddi_molecule_descriptor_t* molecule_descriptor);
+bool eddi_write_gaussian(const char* filename, const eddi_density_field_descriptor_t* density_field_descriptor, const eddi_molecule_descriptor_t* molecule_descriptor);
 
 
 #endif // __EDDI_DENSITY_WRITERS_H__
