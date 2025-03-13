@@ -1,5 +1,5 @@
 /**
- * @file density_readers.h
+ * @file eddi_density_readers.h
  * @author Luca Guffanti
  * @brief Contains function prototypes for reading density fields from different file formats
  */

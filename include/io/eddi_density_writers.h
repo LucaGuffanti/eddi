@@ -1,5 +1,5 @@
 /**
- * @file density_writers.h
+ * @file eddi_density_writers.h
  * @author Luca Guffanti
  * @brief Contains function prototypes for writing density fields to different file formats
  */

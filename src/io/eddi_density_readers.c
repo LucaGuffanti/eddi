@@ -1,8 +1,7 @@
 /**
- * @file density_readers.c
+ * @file eddi_density_readers.c
  * @author Luca Guffanti
  * @brief Implementation of the density readers
- * 
  */
 
 #include "eddi_density_readers.h"

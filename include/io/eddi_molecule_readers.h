@@ -1,5 +1,5 @@
 /**
- * @file molecule_readers.h
+ * @file eddi_molecule_readers.h
  * @author Luca Guffanti
  * @brief Contains function prototypes for reading molecules from different file formats 
  */

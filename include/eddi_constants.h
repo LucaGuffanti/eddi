@@ -1,5 +1,5 @@
 /**
- * @file constants.h
+ * @file eddi_constants.h
  * @author Luca Guffanti
  * @brief Contains a number of constants used throughout the code. 
  */

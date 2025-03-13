@@ -1,5 +1,5 @@
 /**
- * @file density_writers.c
+ * @file eddi_density_writers.c
  * @author Luca Guffanti
  * @brief Implementation of the density writers
  */
