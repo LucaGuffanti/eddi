@@ -8,7 +8,7 @@
 #define __EDDI_MACRO_H__
 
 // Enable and disable prints throughout the library
-#ifdef EDDI_VERBOSE
+#ifdef EDDI_DEBUG
     #define EDDI_DEBUG_PRINT(...) printf(__VA_ARGS__)
     #define EDDI_DEBUG_CALL(...) __VA_ARGS__
 #else

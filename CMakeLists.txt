@@ -17,6 +17,13 @@ option(BUILD_TESTS "Build the tests" ON)
 
 add_subdirectory(src)
 
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(EDDI PRIVATE -Wall -Wextra -DEDDI_DEBUG)
+    add_compile_definitions(EDDI_DEBUG)
+    message(STATUS "Debug mode activated")
+endif()
+
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)

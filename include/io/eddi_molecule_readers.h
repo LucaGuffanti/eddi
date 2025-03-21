@@ -7,17 +7,17 @@
 #ifndef __EDDI_MOLECULE_READERS_H__
 #define __EDDI_MOLECULE_READERS_H__
 
-#include "eddi_base_includes.h"
+#include "eddi_molecule.h"
 
 /**
  * @brief Reads a PDB file containing molecular information and stores the molecule
  * in a molecule descriptor
  * 
  * @param filename input file name
- * @param molecule_descriptor descriptor object where the molecule is stored. Must be already initialized
+ * @param molecule molecule object. Must be already initialized
  * @return true if the file is read completely
  * @return false if any problem occurs during the reading operation
  */
-bool eddi_read_pdb(const char* filename, eddi_molecule_descriptor_t* molecule_descriptor);
+bool eddi_read_pdb(const char* filename, eddi_molecule_t* molecule);
 
 #endif // __EDDI_MOLECULE_READERS_H__
