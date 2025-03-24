@@ -16,4 +16,4 @@
 #include "assert.h"
 #include "string.h"
 
-#endif
+#endif // __EDDI_BASE_INCLUDES_H__

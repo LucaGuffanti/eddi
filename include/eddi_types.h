@@ -34,7 +34,7 @@ typedef EDDI_FLOATING_POINT_TYPE complex eddi_complex_t;
 typedef size_t eddi_size_t;
 
 /**
- * @brief Type of the density field (3D array of real numbers, linearized for memory efficiency).
+ * @brief Array of real numbers.
  */
 typedef eddi_real_t* eddi_array_t;
 
@@ -51,5 +51,7 @@ typedef struct {
     eddi_real_t y;
     eddi_real_t z;
 } eddi_point_t;
+
+
 
 #endif // __EDDI_TYPES_H__

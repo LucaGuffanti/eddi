@@ -19,14 +19,6 @@ bool eddi_new_density_field(eddi_density_field_t* density_field,
 )
 {
 
-    // density_field = (eddi_density_field_t*) malloc(sizeof(density_field));
-
-    // if (!density_field)
-    // {
-    //     EDDI_DEBUG_PRINT("[ERROR] Density field object instantiation failed (descriptor)\n");
-    //     return EDDI_RETURN_FAILURE;
-    // }
-
     density_field->field = (eddi_array_t) malloc(sizeof(eddi_real_t) * n_x * n_y * n_z); 
     if (!density_field->field)
     {

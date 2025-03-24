@@ -20,4 +20,5 @@
  */
 bool eddi_read_pdb(const char* filename, eddi_molecule_t* molecule);
 
+
 #endif // __EDDI_MOLECULE_READERS_H__

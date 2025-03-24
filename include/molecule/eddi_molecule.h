@@ -8,6 +8,7 @@
 #define __EDDI_MOLECULE_H__
 
 #include "eddi_base_includes.h"
+#include "eddi_input_atom_list.h"
 
 /**
  * @brief of a molecule (Structure of Arrays).
@@ -53,7 +54,18 @@ typedef struct {
  * @return eddi_molecule_t* pointer to the allocated molecule
  */
 bool eddi_new_molecule(eddi_molecule_t* molecule, eddi_size_t n_atoms, eddi_array_t x, eddi_array_t y, eddi_array_t z, eddi_atomic_number_t* atomic_numbers);
-bool eddi_destroy_molecule(eddi_molecule_t* molecule);
 
+/**
+ * @brief Translates an atom list to a molecule
+ * @param list input atom list
+ * @param molecule molecule object
+ */
+bool eddi_atom_list_to_molecule(eddi_input_atom_list_t* list, eddi_molecule_t* molecule, eddi_size_t n_atoms);
+
+
+/**
+ * @brief Prints the atoms in a molecule
+ */
+void eddi_print_molecule(eddi_molecule_t* molecule);
 
 #endif // __EDDI_MOLECULE_H__
