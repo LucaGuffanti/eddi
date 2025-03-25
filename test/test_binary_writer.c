@@ -10,7 +10,14 @@ int main(int argc, char** argv)
     eddi_density_field_t field;
 
     assert(argc == 2);
-    if (!eddi_read_gaussian_cube(argv[1], &field, &molecule)) return EDDI_TEST_FAILURE;
-    return !eddi_write_binary("data.bin", &field);
 
+    bool result1 = eddi_read_gaussian_cube(argv[1], &field, &molecule);
+
+    eddi_free_molecule(&molecule);
+    bool result2;
+    if (result1)
+        result2 = !eddi_write_binary("data.bin", &field);
+
+    eddi_free_density_field(&field);
+    return result2;
 }

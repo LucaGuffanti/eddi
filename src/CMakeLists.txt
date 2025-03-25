@@ -9,3 +9,4 @@ file(GLOB_RECURSE SOURCES "*.c")
 
 add_library(EDDI SHARED ${SOURCES})
 target_include_directories(EDDI PUBLIC ${INCLUDE_DIRECTORIES})
+target_link_libraries(EDDI m)

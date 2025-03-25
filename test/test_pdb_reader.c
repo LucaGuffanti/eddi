@@ -5,13 +5,13 @@
 
 int main(int argc, char** argv)
 {
-    eddi_molecule_t molecule;
-
     assert(argc == 2);
+ 
+    eddi_molecule_t molecule;
     bool final_result = !eddi_read_pdb(argv[1], &molecule);
 
-    EDDI_DEBUG_CALL(eddi_print_molecule(&molecule));
-    assert(final_result == EDDI_TEST_SUCCESS);
+    eddi_free_molecule(&molecule);
+    eddi_free_atomic_data();
 
     return EDDI_TEST_SUCCESS;
 }

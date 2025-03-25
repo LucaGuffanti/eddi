@@ -8,6 +8,7 @@
 #define __EDDI_DENSITY_FIELD_H__
 
 #include "eddi_base_includes.h"
+#include "eddi_molecule.h"
 
 /**
  * @brief Type of a 3D density field. 
@@ -80,5 +81,20 @@ bool eddi_new_density_field(eddi_density_field_t* density_field,
     const eddi_size_t n_y,
     const eddi_size_t n_z
 );
+
+/**
+ * @brief Computes the electron density field
+ * 
+ * @param density_field density field object, initialized.
+ * @param molecule molecule object, initialized.
+ */
+void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecule_t* molecule);
+
+/**
+ * @brief Deallocates the electron density field
+ * 
+ * @param density_field density field to be deallocated
+ */
+void eddi_free_density_field(eddi_density_field_t* density_field);
 
 #endif // __EDDI_DENSITY_FIELD_H__

@@ -12,6 +12,7 @@
 
 #include "uthash.h"
 #include "eddi_base_includes.h"
+#include "eddi_density_functions.h"
 
 /**
  * @brief Mapping between symbol and number to be added as an element of
@@ -34,12 +35,22 @@ typedef struct {
      */
     UT_hash_handle hh;
 
-} eddi_atomic_mapping_t;
-
-extern eddi_atomic_mapping_t* symbol_to_number_map;
+} eddi_symbol_number_mapping_t;
 
 /**
- * @brief Initializes the hashmap
+ * @brief Mapping between atomic symbol and atomic number
+ * 
+ */
+extern eddi_symbol_number_mapping_t* symbol_to_number_map;
+
+/**
+ * @brief Initializes the symbol to number mapping
+ * 
+ */
+void eddi_init_symbol_mapping();
+
+/**
+ * @brief Initializes all the atomic data
 */
 void eddi_init_atomic_data();
 
@@ -50,5 +61,9 @@ void eddi_init_atomic_data();
  */
 eddi_atomic_number_t eddi_symbol_to_number(const char* symbol);
 
+/**
+ * @brief Frees the utility structures that have been allocated
+ */
+void eddi_free_atomic_data();
 
 #endif // __EDDI_ATOMIC_DATA_H__

@@ -9,6 +9,7 @@
 
 #include "eddi_base_includes.h"
 #include "eddi_input_atom_list.h"
+#include "eddi_density_functions.h"
 
 /**
  * @brief of a molecule (Structure of Arrays).
@@ -33,7 +34,7 @@ typedef struct {
     /**
      * @brief density functions of the atoms.
      */
-    eddi_real_t (**density)(double, double, double);
+    eddi_real_t (**density)(eddi_real_t, eddi_real_t, eddi_real_t);
     
     /**
      * @brief List of atomic numbers;
@@ -67,5 +68,10 @@ bool eddi_atom_list_to_molecule(eddi_input_atom_list_t* list, eddi_molecule_t* m
  * @brief Prints the atoms in a molecule
  */
 void eddi_print_molecule(eddi_molecule_t* molecule);
+
+/**
+ * @brief Frees the memory allocated to a molecule
+ */
+void eddi_free_molecule(eddi_molecule_t* molecule);
 
 #endif // __EDDI_MOLECULE_H__

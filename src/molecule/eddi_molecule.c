@@ -15,14 +15,21 @@ bool eddi_new_molecule(eddi_molecule_t* molecule, eddi_size_t n_atoms, eddi_arra
     molecule->atoms_y = (eddi_array_t) malloc(sizeof(eddi_real_t) * n_atoms);
     molecule->atoms_z = (eddi_array_t) malloc(sizeof(eddi_real_t) * n_atoms);
     molecule->atomic_numbers = (eddi_atomic_number_t*) malloc(sizeof(eddi_atomic_number_t) * n_atoms);
+    
+    // Because the function pointer is, well, a pointer
+    molecule->density = malloc(sizeof(ptrdiff_t) * n_atoms);
+
 
     memcpy(molecule->atoms_x, x, sizeof(eddi_real_t) * n_atoms);
     memcpy(molecule->atoms_y, y, sizeof(eddi_real_t) * n_atoms);
     memcpy(molecule->atoms_z, z, sizeof(eddi_real_t) * n_atoms);
     memcpy(molecule->atomic_numbers, atomic_numbers, sizeof(char) * n_atoms);
 
-
-    // TODO: associate a set of wavefunctions to each atom
+    for (eddi_size_t i = 0; i < n_atoms; ++i)
+    {
+        printf("Associating to atom %d (%d) the %d function.\n", i, molecule->atomic_numbers[i], molecule->atomic_numbers[i]-1);
+        molecule->density[i] = eddi_densities[molecule->atomic_numbers[i]-1];
+    }
     
     return EDDI_RETURN_SUCCESS;
 
@@ -62,3 +69,17 @@ void eddi_print_molecule(eddi_molecule_t* molecule)
                molecule->atomic_numbers[it]);
 }
 
+void eddi_free_molecule(eddi_molecule_t* molecule)
+{
+    free(molecule->atoms_x);
+    free(molecule->atoms_y);
+    free(molecule->atoms_z);
+    free(molecule->atomic_numbers);
+    free(molecule->density);
+    
+    molecule->atoms_x = NULL;
+    molecule->atoms_y = NULL;
+    molecule->atoms_z = NULL;
+    molecule->atomic_numbers = NULL;
+    molecule->density = NULL;
+}

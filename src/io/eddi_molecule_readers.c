@@ -55,7 +55,8 @@ bool eddi_read_pdb(const char* filename, eddi_molecule_t* molecule)
 
     // Now transform the atomic list to a molecule object.
     eddi_atom_list_to_molecule(atom_list, molecule, count);
-
+    eddi_free_input_atom_list(atom_list);
+    
     return EDDI_RETURN_SUCCESS;
 }
 

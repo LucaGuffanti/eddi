@@ -17,6 +17,7 @@ bool eddi_add_atom_to_list_atomic_number(eddi_input_atom_list_t** list, const ed
     if (!(atom = (eddi_input_atom_list_t*) malloc(sizeof(eddi_input_atom_list_t))))
     {
         EDDI_DEBUG_PRINT("[ERROR] Could not allocate atom object.");
+        eddi_free_input_atom_list(*list);
         return EDDI_RETURN_FAILURE;
     }
 
@@ -36,6 +37,7 @@ bool eddi_add_atom_to_list_atomic_number(eddi_input_atom_list_t** list, const ed
         *list = atom;
     }
     EDDI_DEBUG_PRINT("Added atom %lf %lf %lf %d\n", x, y, z, atomic_number);
+    
     return EDDI_RETURN_SUCCESS;
 }
 
@@ -48,4 +50,5 @@ void eddi_free_input_atom_list(eddi_input_atom_list_t* list)
         free(it);
         it = list;
     }
+    free(list);
 }

@@ -119,6 +119,7 @@ bool eddi_read_gaussian_cube(const char* filename, eddi_density_field_t* density
                  x_positions[atom_idx], y_positions[atom_idx], z_positions[atom_idx]);
     }
 
+
     if (!eddi_new_molecule(molecule, n_atoms, x_positions, y_positions, z_positions, atomic_numbers))
     {
         EDDI_DEBUG_PRINT("[ERROR] Could not create molecule\n");
@@ -128,6 +129,7 @@ bool eddi_read_gaussian_cube(const char* filename, eddi_density_field_t* density
 
     EDDI_DEBUG_PRINT("[INFO] Creating Molecule\n");
     // Then, construct the density field and prepare it to hold the values
+
     if (!eddi_new_density_field(density_field, dx, dy, dz, &origin, x_size, y_size, z_size))
     {
         EDDI_DEBUG_PRINT("[ERROR] Could not allocate density field\n");

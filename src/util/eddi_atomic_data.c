@@ -7,12 +7,12 @@
 
 #include "eddi_atomic_data.h"
 
-eddi_atomic_mapping_t* symbol_to_number_map = NULL;
+eddi_symbol_number_mapping_t* symbol_to_number_map = NULL;
+eddi_symbol_number_mapping_t* mappings_space = NULL;
 
-void eddi_init_atomic_data()
+void eddi_init_symbol_mapping()
 {
-
-    eddi_atomic_mapping_t* mappings = (eddi_atomic_mapping_t*) malloc(sizeof(eddi_atomic_mapping_t) * MAX_ATOMIC_NUMBER);
+    eddi_symbol_number_mapping_t* mappings_space = (eddi_symbol_number_mapping_t*) malloc(sizeof(eddi_symbol_number_mapping_t) * MAX_ATOMIC_NUMBER);
     char* names[] = {
         "H\0", "HE\0", "LI\0", "BE\0", "B\0", "C\0", "N\0", "O\0", "F\0", "NE\0",
         "NA\0", "MG\0", "AL\0", "SI\0", "P\0", "S\0", "CL\0", "AR\0", "K\0", "CA\0",
@@ -28,13 +28,20 @@ void eddi_init_atomic_data()
 
     for (size_t i = 0; i < MAX_ATOMIC_NUMBER; ++i)
     {
-        eddi_atomic_mapping_t* current_mapping = mappings + i;
+        eddi_symbol_number_mapping_t* current_mapping = mappings_space + i;
         current_mapping->number = i+1;
         memcpy(current_mapping->symbol, names[i], 3);
-        EDDI_DEBUG_PRINT("Adding %s to hash map\n", names[i]);
     
         HASH_ADD_STR(symbol_to_number_map, symbol, current_mapping);
     }
+}
+
+void eddi_init_atomic_data()
+{
+
+    // Initialize the symbol mapping
+    EDDI_DEBUG_PRINT("Initializing symbol to number mapping\n");
+    eddi_init_symbol_mapping();
 }
 
 eddi_atomic_number_t eddi_symbol_to_number(const char* symbol)
@@ -45,9 +52,14 @@ eddi_atomic_number_t eddi_symbol_to_number(const char* symbol)
         EDDI_DEBUG_PRINT("Initializing data\n");
     }
 
-    eddi_atomic_mapping_t* mapping;
+    eddi_symbol_number_mapping_t* mapping;
     EDDI_DEBUG_PRINT("Searching atomic number for %s\n", symbol);
     HASH_FIND_STR( symbol_to_number_map, symbol, mapping);
     EDDI_DEBUG_PRINT("Retrieved %d for %s\n", mapping->number, symbol);
     return mapping->number;
+}
+
+void eddi_free_atomic_data()
+{
+    free(mappings_space);
 }

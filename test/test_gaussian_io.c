@@ -11,8 +11,16 @@ int main(int argc, char** argv)
 
     assert(argc == 3);
     if (!eddi_read_gaussian_cube(argv[1], &field, &molecule))
+    {
+        eddi_free_density_field(&field);
+        eddi_free_molecule(&molecule);
         return EDDI_TEST_FAILURE;
-    else 
-        return !eddi_write_gaussian_cube(argv[2], &field, &molecule);
+    }  
+
+    bool res = eddi_write_gaussian_cube(argv[2], &field, &molecule);
+    eddi_free_density_field(&field);
+    eddi_free_molecule(&molecule);
+
+    return !res;
 
 }
