@@ -9,13 +9,13 @@
 eddi_real_t eddi_H_slater(const eddi_real_t r, const eddi_real_t theta, const eddi_real_t phi)
 {
     // 1s1
-    return 0.3183098861837909 * exp(-2*r);
+    return 0.3183098861837909 * exp(-2.0 * r);
 }
 
 eddi_real_t eddi_He_slater(const eddi_real_t r, const eddi_real_t theta, const eddi_real_t phi)
 {
     //1s2
-    return ;
+    return 1.56385647082292 * exp(-2.0 * 1.700000 * r);
 }
 
 eddi_real_t eddi_Li_slater(const eddi_real_t r, const eddi_real_t theta, const eddi_real_t phi)

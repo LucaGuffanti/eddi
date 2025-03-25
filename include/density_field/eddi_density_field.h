@@ -69,10 +69,11 @@ typedef struct {
  * @param n_x number of points along the x direction
  * @param n_y number of points along the y direction
  * @param n_z number of points along the z direction
- * @return true if the density field is create correctly 
+ * @return true if the density field is created correctly 
  * @return false if any error occurs during instantiation of the density field
  */
-bool eddi_new_density_field(eddi_density_field_t* density_field, 
+bool eddi_new_density_field(
+    eddi_density_field_t* density_field, 
     const eddi_real_t dx,
     const eddi_real_t dy, 
     const eddi_real_t dz,
@@ -80,6 +81,29 @@ bool eddi_new_density_field(eddi_density_field_t* density_field,
     const eddi_size_t n_x,
     const eddi_size_t n_y,
     const eddi_size_t n_z
+);
+
+/**
+ * @brief Initializes a density field given a molecule. More specifically,
+ * defines the boundary of the domain based on the maximum and minium atomic positions,
+ * and defines the number of elements based on the wanted resolution.
+ * 
+ * @param density_field density field object
+ * @param molecule object
+ * @param padding distance from the border of the domain
+ * @param dx x resolution
+ * @param dy y resolution
+ * @param dz z resolution
+ * @return true  if the density is created correctly 
+ * @return false if any error occurs during instantiation of the density field.
+ */
+bool eddi_init_field_from_molecule(
+    eddi_density_field_t* density_field, 
+    const eddi_molecule_t* molecule,
+    const eddi_real_t padding,
+    const eddi_real_t dx,
+    const eddi_real_t dy,
+    const eddi_real_t dz
 );
 
 /**

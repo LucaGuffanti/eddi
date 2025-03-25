@@ -2,7 +2,7 @@
 #include "eddi_density_field.h"
 #include "eddi_density_writers.h"
 
-// Doing a simple simulation of an Hydrogren atom centered in 0.0
+// Doing a simple simulation of an Hydrogren molecule centered in 0.0
 int main(int argc, char** argv)
 {
     eddi_molecule_t molecule;

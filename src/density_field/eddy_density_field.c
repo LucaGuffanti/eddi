@@ -6,9 +6,8 @@
 
 #include "eddi_density_field.h"
 
-
-
-bool eddi_new_density_field(eddi_density_field_t* density_field, 
+bool eddi_new_density_field(
+    eddi_density_field_t* density_field, 
     const eddi_real_t dx,
     const eddi_real_t dy, 
     const eddi_real_t dz,
@@ -37,6 +36,61 @@ bool eddi_new_density_field(eddi_density_field_t* density_field,
 
     return EDDI_RETURN_SUCCESS; // Allocation successful
 }
+
+bool eddi_init_field_from_molecule(
+    eddi_density_field_t* density_field, 
+    const eddi_molecule_t* molecule,
+    const eddi_real_t padding,
+    const eddi_real_t dx,
+    const eddi_real_t dy,
+    const eddi_real_t dz
+)
+{
+
+    // Extract the mininum and maximum positions of the atoms along each direction
+    eddi_real_t min_x = molecule->atoms_x[0];
+    eddi_real_t max_x = molecule->atoms_x[0];
+
+    eddi_real_t min_y = molecule->atoms_y[0];
+    eddi_real_t max_y = molecule->atoms_y[0];
+    
+    eddi_real_t min_z = molecule->atoms_z[0];
+    eddi_real_t max_z = molecule->atoms_z[0];
+
+    for (eddi_size_t i = 1; i < molecule->n_atoms; ++i)
+    {
+        if (molecule->atoms_x[i] < min_x) min_x = molecule->atoms_x[i];
+        if (molecule->atoms_x[i] > max_x) max_x = molecule->atoms_x[i];
+
+        if (molecule->atoms_y[i] < min_y) min_y = molecule->atoms_y[i];
+        if (molecule->atoms_y[i] > max_y) max_y = molecule->atoms_y[i];
+
+        if (molecule->atoms_z[i] < min_z) min_z = molecule->atoms_z[i];
+        if (molecule->atoms_z[i] > max_z) max_z = molecule->atoms_z[i];
+    }
+
+    // Add padding to the min and max values
+    min_x -= padding;
+    max_x += padding;
+
+    min_y -= padding;
+    max_y += padding;
+
+    min_z -= padding;
+    max_z += padding;
+
+    // Calculate the number of grid points along each direction
+    eddi_size_t n_x = (eddi_size_t)ceil((max_x - min_x) / dx);
+    eddi_size_t n_y = (eddi_size_t)ceil((max_y - min_y) / dy);
+    eddi_size_t n_z = (eddi_size_t)ceil((max_z - min_z) / dz);
+
+    // Set the origin point
+    eddi_point_t origin = {min_x, min_y, min_z};
+
+    // Initialize the density field
+    return eddi_new_density_field(density_field, dx, dy, dz, &origin, n_x, n_y, n_z);
+}
+
 
 void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecule_t* molecule)
 {
@@ -101,6 +155,7 @@ void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecu
         cx += dx;
     }
 }
+
 
 void eddi_free_density_field(eddi_density_field_t* density_field)
 {
