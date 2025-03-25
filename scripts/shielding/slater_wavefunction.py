@@ -5,9 +5,11 @@
 import numpy as np
 import scipy.integrate as spi
 import math as math
+import os
 
 from constants import *
 from shielding_constant_calculator import ShieldingConstantsCalculator
+import csv
 
 class SlaterWaveFunction():
     """Class that computes the Slater wavefunction for an atomic species, given its atomic number.
@@ -48,6 +50,7 @@ class SlaterWaveFunction():
         self.atomic_number = atomic_number
         self.shielding_constants_calculator = ShieldingConstantsCalculator()
         self.shielding_constants_calculator.compute(atomic_number, atomic_number)
+        self.normalization_constants = {}
 
         if self.verbose:
             self.shielding_constants_calculator.print_data()
@@ -63,6 +66,19 @@ class SlaterWaveFunction():
 
 
         self.check_global_density()
+        self.print_normalization_constants()
+
+    def print_normalization_constants(self):
+        os.makedirs('output/normalizations', exist_ok=True)
+
+        with open(f'output/normalizations/normalization_constants{self.atomic_number}.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Electron Configuration", "Normalization Constant", "Normalization Constant Squared"])
+            for key, value in self.normalization_constants.items():
+                writer.writerow([key, value, value**2])
+
+        if self.verbose:
+            print("Normalization constants have been written to 'normalization_constants.csv'.")
 
     def construct_wavefunction(self, electron_configuration: str) -> tuple:
         """Constructs the Slater radial wavefunction and the total density function for a given electron configuration, considering
@@ -107,6 +123,8 @@ class SlaterWaveFunction():
         
         wf = lambda r: n_constant * r**(n_star - 1) * np.exp(-zeta * r)
         density = lambda r: n_e * (n_constant * r**(n_star - 1) * np.exp(-zeta * r))**2
+
+        self.normalization_constants[electron_configuration[0]] = n_constant
 
         if self.verbose:
             print("----Density Wave function check----")
@@ -258,5 +276,6 @@ class SlaterWaveFunction():
         return (res_dist, res_matrix)
 
 if __name__ == '__main__':
-    wf = SlaterWaveFunction(26, verbose=True)
+    for i in range(1,27):
+        wf = SlaterWaveFunction(i, verbose=True)
     print(wf.density(1.0))
