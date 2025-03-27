@@ -14,6 +14,7 @@
 #else
     #define EDDI_DEBUG_PRINT(...)
     #define EDDI_DEBUG_CALL(...)
+
 #endif
 
 #endif // __EDDI_MACRO_H__

@@ -292,13 +292,19 @@ class SlaterWaveFunction():
         """Prints the formula for the total electron density
         """
         
-        with open(f'output/density_formula_{self.atomic_number}.txt', 'w') as f:
+        with open(f'output/density_formulas.txt', 'a') as f:
+            f.write(f"eddi_real_t eddi_{self.atomic_number}_slater(eddi_real_t r, eddi_real_t /*theta*/, eddi_real_t /*phi*/)\n")
+            f.write("{\n")
+            f.write("\t// Slater wavefunction for atomic number ")
+            f.write(f"{self.atomic_number}\n")
+            f.write("\treturn ")
             for term in self.terms:
                 if term != self.terms[-1]:
                     f.write(f"{term} + ")
                 else:
                     f.write(f"{term}")
-            f.write('\n')
+            f.write(';\n')
+            f.write("}\n\n")
 
 if __name__ == '__main__':
     for i in range(1,27):
