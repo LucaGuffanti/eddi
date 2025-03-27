@@ -24,6 +24,9 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
     # Define debug macro
     message(STATUS "Configuring EDDI in DEBUG mode")
     target_compile_definitions(EDDI PRIVATE EDDI_DEBUG)
+elseif(CMAKE_BUILD_TYPE MATCHES "Profiling")
+    # Release mode settings
+    message(STATUS "Configuring EDDI in PROFILING mode")
 endif()
 
 # Include directories

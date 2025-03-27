@@ -25,6 +25,9 @@ bool eddi_new_molecule(eddi_molecule_t* molecule, eddi_size_t n_atoms, eddi_arra
     memcpy(molecule->atoms_z, z, sizeof(eddi_real_t) * n_atoms);
     memcpy(molecule->atomic_numbers, atomic_numbers, sizeof(char) * n_atoms);
 
+#ifdef _OPENMP
+    #pragma omp parallel for shared(molecule, eddi_densities)
+#endif
     for (eddi_size_t i = 0; i < n_atoms; ++i)
     {
         EDDI_DEBUG_PRINT("Associating to atom %d (%d) the %d function.\n", i, molecule->atomic_numbers[i], molecule->atomic_numbers[i]-1);
