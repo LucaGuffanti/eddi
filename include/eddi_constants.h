@@ -15,5 +15,6 @@
 #define EDDI_RETURN_SUCCESS true
 #define EDDI_RETURN_FAILURE false
 
+#define EDDI_ANGSTROM_TO_BOHR 1.8897259886
 
 #endif // __EDDI_CONSTANTS_H__

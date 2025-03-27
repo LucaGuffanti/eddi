@@ -39,6 +39,11 @@ bool eddi_read_pdb(const char* filename, eddi_molecule_t* molecule)
             fscanf(fp, " %*d %*s %*s %*s %*d %lf %lf %lf %*lf %*lf %s", &x, &y, &z, name);
             // EDDI_DEBUG_PRINT("%lf %lf %lf %s\n", x, y, z, name);
 
+            // PDB files provide atom information in Angstroms!
+            x = x * EDDI_ANGSTROM_TO_BOHR;
+            y = y * EDDI_ANGSTROM_TO_BOHR;
+            z = z * EDDI_ANGSTROM_TO_BOHR;
+
             if (!eddi_add_atom_to_list_symbol(&atom_list, x, y, z, name))
             {
                 EDDI_DEBUG_PRINT("[ERROR] Atom was not added to list\n");

@@ -27,7 +27,7 @@ bool eddi_new_molecule(eddi_molecule_t* molecule, eddi_size_t n_atoms, eddi_arra
 
     for (eddi_size_t i = 0; i < n_atoms; ++i)
     {
-        printf("Associating to atom %d (%d) the %d function.\n", i, molecule->atomic_numbers[i], molecule->atomic_numbers[i]-1);
+        EDDI_DEBUG_PRINT("Associating to atom %d (%d) the %d function.\n", i, molecule->atomic_numbers[i], molecule->atomic_numbers[i]-1);
         molecule->density[i] = eddi_densities[molecule->atomic_numbers[i]-1];
     }
     

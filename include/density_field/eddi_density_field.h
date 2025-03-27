@@ -10,6 +10,10 @@
 #include "eddi_base_includes.h"
 #include "eddi_molecule.h"
 
+#ifdef _OPENMP
+#include "omp.h"
+#endif
+
 /**
  * @brief Type of a 3D density field. 
  */

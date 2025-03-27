@@ -45,7 +45,7 @@ eddi_real_t eddi_N_slater(const eddi_real_t r, const eddi_real_t theta, const ed
 
 eddi_real_t eddi_O_slater(const eddi_real_t r, const eddi_real_t theta, const eddi_real_t phi)
 {
-    return 0.0;
+    return 2 * 145.3189672691407 * exp(-2 * 7.7 * r) + 6 * 6.46600263938176 * pow(r, 2.0) * exp(-2 * 2.275 * r);
 }
 
 eddi_real_t eddi_F_slater(const eddi_real_t r, const eddi_real_t theta, const eddi_real_t phi)

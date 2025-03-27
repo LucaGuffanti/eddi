@@ -16,4 +16,8 @@
 #include "assert.h"
 #include "string.h"
 
+#ifdef _OPENMP
+    #include "omp.h"
+#endif 
+
 #endif // __EDDI_BASE_INCLUDES_H__
