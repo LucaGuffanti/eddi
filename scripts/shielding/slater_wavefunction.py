@@ -51,6 +51,7 @@ class SlaterWaveFunction():
         self.shielding_constants_calculator = ShieldingConstantsCalculator()
         self.shielding_constants_calculator.compute(atomic_number, atomic_number)
         self.normalization_constants = {}
+        self.terms = []
 
         if self.verbose:
             self.shielding_constants_calculator.print_data()
@@ -133,6 +134,18 @@ class SlaterWaveFunction():
             print(" ∫ρ(r)r^2dr  = ", integral)
             print(" n_e         = ", n_e)
             print(" check: |n_e - ∫ρ(r)r^2dr| < ε_r  = ", abs(n_e - integral) < self.number_electrons_epsilon)
+
+
+        if n_e != 1:
+            if 2 * n_star - 2 != 0:
+                self.terms.append(f"{n_e} * {n_constant ** 2} * pow(r, {2*n_star - 2}) * exp(-2 * {zeta} * r)")
+            else:
+                self.terms.append(f"{n_e} * {n_constant ** 2} * exp(-2 * {zeta} * r)")
+        else:
+            if 2 * n_star - 2 != 0:
+                self.terms.append(f"{n_constant ** 2} * pow(r, {2*n_star - 2}) * exp(-2 * {zeta} * r)")
+            else:
+                self.terms.append(f"{n_constant ** 2} * exp(-2 * {zeta} * r)")
 
         return (wf, density)
 
@@ -275,7 +288,19 @@ class SlaterWaveFunction():
             res_matrix.append(res_dens)
         return (res_dist, res_matrix)
 
+    def print_density_formula(self):
+        """Prints the formula for the total electron density
+        """
+        
+        with open(f'output/density_formula_{self.atomic_number}.txt', 'w') as f:
+            for term in self.terms:
+                if term != self.terms[-1]:
+                    f.write(f"{term} + ")
+                else:
+                    f.write(f"{term}")
+            f.write('\n')
+
 if __name__ == '__main__':
     for i in range(1,27):
         wf = SlaterWaveFunction(i, verbose=True)
-    print(wf.density(1.0))
+        wf.print_density_formula()
