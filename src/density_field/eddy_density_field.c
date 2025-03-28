@@ -112,44 +112,84 @@ void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecu
 
     const eddi_size_t atoms = molecule->n_atoms;
 
-    const double target_iso = 0.106329;
+// #ifdef _OPENMP
+//     #pragma omp parallel for collapse(3) shared(density_field, molecule)
+// #else
+// #endif
+    // for (eddi_size_t it_x = 0; it_x < nx; ++it_x)
+    // {
+    //     for (eddi_size_t it_y = 0; it_y < ny; ++it_y)
+    //     {
+    //         for (eddi_size_t it_z = 0; it_z < nz; ++it_z)
+    //         {
+    //             eddi_real_t local_density = 0.0;
+    //             eddi_real_t radius;
+    //             for (eddi_size_t atom_idx = 0; atom_idx < atoms; ++atom_idx)
+    //             {
+    //                 const eddi_real_t cx = origin_x + it_x * dx;
+    //                 const eddi_real_t cy = origin_y + it_y * dy;
+    //                 const eddi_real_t cz = origin_z + it_z * dz;
+                    
+    //                 const eddi_real_t DeltaX = cx - molecule->atoms_x[atom_idx];
+    //                 const eddi_real_t DeltaY = cy - molecule->atoms_y[atom_idx];
+    //                 const eddi_real_t DeltaZ = cz - molecule->atoms_z[atom_idx];
+    //                 radius = sqrt(DeltaX * DeltaX + DeltaY * DeltaY + DeltaZ * DeltaZ);
+                    
+    //                 if (radius < dx) 
+    //                 {
+    //                     local_density += 0.0;
+    //                 } 
+    //                 else
+    //                 {
+    //                     local_density += molecule->density[atom_idx](radius, 0.0, 0.0);
+    //                 }
 
-#ifdef _OPENMP
-    #pragma omp parallel for collapse(3) shared(density_field, molecule)
-#else
-#endif
-    for (eddi_size_t it_x = 0; it_x < nx; ++it_x)
+    //             }
+    //             density_field->field[it_x * ny * nz + it_y * nz + it_z] = local_density;
+    //         }
+    //     }
+    // }
+
+    const eddi_real_t dx_2 = dx * dx;
+
+    eddi_array_t x = molecule->atoms_x;
+    eddi_array_t y = molecule->atoms_y;
+    eddi_array_t z = molecule->atoms_z;
+
+    eddi_array_t field = density_field->field;
+
+    const eddi_size_t n_pts = nx * ny * nz;
+    #pragma omp parallel for 
+    for (eddi_size_t idx = 0; idx < n_pts; ++idx)
     {
-        for (eddi_size_t it_y = 0; it_y < ny; ++it_y)
-        {
-            for (eddi_size_t it_z = 0; it_z < nz; ++it_z)
-            {
-                eddi_real_t local_density = 0.0;
-                eddi_real_t radius;
-                for (eddi_size_t atom_idx = 0; atom_idx < atoms; ++atom_idx)
-                {
-                    const eddi_real_t cx = origin_x + it_x * dx;
-                    const eddi_real_t cy = origin_y + it_y * dy;
-                    const eddi_real_t cz = origin_z + it_z * dz;
-                    
-                    const eddi_real_t DeltaX = cx - molecule->atoms_x[atom_idx];
-                    const eddi_real_t DeltaY = cy - molecule->atoms_y[atom_idx];
-                    const eddi_real_t DeltaZ = cz - molecule->atoms_z[atom_idx];
-                    radius = sqrt(DeltaX * DeltaX + DeltaY * DeltaY + DeltaZ * DeltaZ);
-                    
-                    if (radius < dx) 
-                    {
-                        local_density += 0.0;
-                    } 
-                    else
-                    {
-                        local_density += molecule->density[atom_idx](radius, 0.0, 0.0);
-                    }
+        const eddi_size_t it_z = idx % nz;
+        const eddi_size_t it_y = (idx / nz) % ny;
+        const eddi_size_t it_x = (idx / nz) / ny;
 
-                }
-                density_field->field[it_x * ny * nz + it_y * nz + it_z] = local_density;
+        const eddi_real_t cx = origin_x + it_x * dx;
+        const eddi_real_t cy = origin_y + it_y * dy;
+        const eddi_real_t cz = origin_z + it_z * dz;
+
+        eddi_real_t local_density = 0.0;
+        for (eddi_size_t atom_idx = 0; atom_idx < atoms; ++atom_idx)
+        {
+            
+            const eddi_real_t DeltaX = cx - x[atom_idx];
+            const eddi_real_t DeltaY = cy - y[atom_idx];
+            const eddi_real_t DeltaZ = cz - z[atom_idx];
+            const eddi_real_t radius_2 = DeltaX * DeltaX + DeltaY * DeltaY + DeltaZ * DeltaZ;
+            
+            if (radius_2 < dx_2) 
+            {
+                continue;
+            } 
+            else
+            {
+                local_density += molecule->density[atom_idx](sqrt(radius_2), 0.0, 0.0);
             }
+
         }
+        field[idx] = local_density;
     }
 }
 

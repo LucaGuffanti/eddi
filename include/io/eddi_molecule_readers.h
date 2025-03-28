@@ -20,5 +20,15 @@
  */
 bool eddi_read_pdb(const char* filename, eddi_molecule_t* molecule);
 
+/**
+ * @brief Reads a MOL/SDF file containing molecular information and stores the molecule
+ * in a molecule descriptor
+ * 
+ * @param filename input file name
+ * @param molecule molecule object
+ * @return true if the file is read completely
+ * @return false if any problem occurs during the reading operation
+ */
+bool eddi_read_mol(const char* filename, eddi_molecule_t* molecule);
 
 #endif // __EDDI_MOLECULE_READERS_H__

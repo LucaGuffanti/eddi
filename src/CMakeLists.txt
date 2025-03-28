@@ -20,13 +20,16 @@ if (ENABLE_OPENMP)
 endif()
 
 # Debug mode settings
-if (CMAKE_BUILD_TYPE MATCHES "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Define debug macro
     message(STATUS "Configuring EDDI in DEBUG mode")
     target_compile_definitions(EDDI PRIVATE EDDI_DEBUG)
-elseif(CMAKE_BUILD_TYPE MATCHES "Profiling")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Profile")
+    # Profile mode settings
+    message(STATUS "Configuring EDDI in PROFILE mode")
+else()
     # Release mode settings
-    message(STATUS "Configuring EDDI in PROFILING mode")
+    message(STATUS "Configuring EDDI in RELEASE mode")
 endif()
 
 # Include directories

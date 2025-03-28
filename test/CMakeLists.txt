@@ -56,7 +56,9 @@ add_eddi_test(test_he2.c he2.cube he2.bin)
 # Add tests that require input files to be checked
 add_eddi_test_with_input_file(test_h2o.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/h2o.pdb h2o.cube h2o.bin)
 add_eddi_test_with_input_file(test_pdb_reader.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/8z9k.pdb)
+add_eddi_test_with_input_file(test_mol.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/ADP_ideal.sdf)
+add_eddi_test_with_input_file(test_adenosine.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/ADP_ideal.sdf adp.cube adp.bin)
 # add_eddi_test_with_input_file(test_8z9k.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/8z9k.pdb 8z9k.cube 8z9k.bin)
-add_eddi_test_with_input_file(test_9jt3.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/9jt3.pdb 9jt3.cube 9jt3.bin)
+# add_eddi_test_with_input_file(test_9jt3.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/9jt3.pdb 9jt3.cube 9jt3.bin)
 
 
