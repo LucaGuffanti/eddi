@@ -22,9 +22,10 @@ set(INCLUDE_DIRECTORIES
 )
 
 # Option to build tests
-option(BUILD_TESTS "Build the tests" ON)
 option(BUILD_SHARED_LIB "Build EDDI as a shared library" ON)
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
+option(ENABLE_FASTMATH "Enable fast math optimizations" OFF)
+option(BUILD_TESTS "Build the tests" ON)
 
 
 
@@ -32,6 +33,12 @@ option(ENABLE_OPENMP "Enable OpenMP support" ON)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build (Debug, Release, Profile)." FORCE)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "Profile")
+endif()
+
+if (ENABLE_FASTMATH)
+    message(STATUS "Fast math optimizations enabled")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
 endif()
 
 # Debug mode configuration
@@ -62,8 +69,9 @@ else()
     
     # Release mode configuration
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -O3")
-    
 endif()
+
+
 
 # Add the source directory
 add_subdirectory(src)

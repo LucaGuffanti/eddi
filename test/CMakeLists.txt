@@ -58,7 +58,7 @@ add_eddi_test_with_input_file(test_h2o.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/
 add_eddi_test_with_input_file(test_pdb_reader.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/8z9k.pdb)
 add_eddi_test_with_input_file(test_mol.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/ADP_ideal.sdf)
 add_eddi_test_with_input_file(test_adenosine.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/ADP_ideal.sdf adp.cube adp.bin)
-# add_eddi_test_with_input_file(test_8z9k.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/8z9k.pdb 8z9k.cube 8z9k.bin)
-# add_eddi_test_with_input_file(test_9jt3.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/9jt3.pdb 9jt3.cube 9jt3.bin)
+add_eddi_test_with_input_file(test_8z9k.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/8z9k.pdb 8z9k.cube 8z9k.bin)
+add_eddi_test_with_input_file(test_9jt3.c ${CMAKE_CURRENT_BINARY_DIR}/../../data/9jt3.pdb 9jt3.cube 9jt3.bin)
 
 
