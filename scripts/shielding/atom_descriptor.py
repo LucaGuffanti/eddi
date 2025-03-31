@@ -3,6 +3,10 @@ from slater_wavefunction import SlaterWaveFunction
 from constants import *
 from utils.download_data import load_vdw_radii
 from config import *
+import pandas as pd
+
+df = pd.read_csv(PERIODIC_TABLE_PATH)
+
 
 
 class AtomDescriptor:
@@ -24,9 +28,11 @@ class AtomDescriptor:
         self.slater_wf = SlaterWaveFunction(self.atomic_number)
         self.nuclear_radius = 0
         self.charge = 0
+        self.atomic_mass = df[df['AtomicNumber'] == self.atomic_number]['AtomicMass'].values[0]
 
         self.vdw_radius = (data[self.atomic_number] / 100) * BOHRS_PER_ANGSTROMS
-                
+        self.nuclear_radius = np.cbrt(self.atomic_mass) * 1.25e-15 # These are meters
+        self.nuclear_radius = self.nuclear_radius * BOHRS_PER_ANGSTROMS  * 1e10
 
 
     def radial_coordinate_density(self, radius):

@@ -46,7 +46,9 @@ AMBER_RADII_ANGSTROMS = {
     6 : 1.9080, # C
     7 : 1.8240, # N
     8 : 1.6612, # O
-    16 : 2.0000 # S
+    15 : 2.1000, # P
+    16 : 2.0000, # S
+
 }
 
 AMBER_RADII_BOHRS = {k : v * BOHRS_PER_ANGSTROMS for k, v in AMBER_RADII_ANGSTROMS.items()}
