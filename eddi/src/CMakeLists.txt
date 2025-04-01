@@ -33,7 +33,7 @@ else()
 endif()
 
 # Include directories
-target_include_directories(EDDI PUBLIC ${INCLUDE_DIRECTORIES})
+target_include_directories(EDDI PUBLIC ${EDDI_INCLUDE_DIRECTORIES})
 
 # Link math library
 target_link_libraries(EDDI PRIVATE m)
