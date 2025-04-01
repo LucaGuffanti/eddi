@@ -16,4 +16,4 @@ target_include_directories(EDDI-G PUBLIC ${EDDI_G_INCLUDE_DIRECTORIES})
 
 target_link_libraries(EDDI-G PRIVATE ${CUDA_LIBRARIES})
 
-status(STATUS "=== EDDI-G configured ===")
+message(STATUS "=== EDDI-G configured ===")
