@@ -38,7 +38,7 @@ macro(add_eddi_test_with_input_file TEST_SOURCE INPUT_FILE)
     if (EXISTS ${INPUT_FILE})
         add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} ${INPUT_FILE} ${ARGN})
     else()
-        message(WARNING "Input file ${INPUT_FILE} does not exist. Skipping test ${TEST_NAME}.")
+        message(STATUS "-> No input file. ${TEST_NAME} Skipped.\n")
     endif()
 endmacro()
 

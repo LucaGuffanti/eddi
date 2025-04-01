@@ -1,0 +1,19 @@
+message(STATUS "=== Configuring EDDI-G ===")
+
+file(GLOB_RECURSE SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
+file(GLOB_RECURSE SRC_FILES_CUDA "${CMAKE_CURRENT_SOURCE_DIR}/*.cu")
+
+add_library(EDDI-G SHARED ${SRC_FILES} ${SRC_FILES_CUDA})
+
+set_target_properties(EDDI-G PROPERTIES 
+    CUDA_SEPARABLE_COMPILATION ON
+    CUDA_ARCHITECTURES "60;70;75"
+    POSITION_INDEPENDENT_CODE ON
+    C_STANDARD 11
+)
+
+target_include_directories(EDDI-G PUBLIC ${EDDI_G_INCLUDE_DIRECTORIES})
+
+target_link_libraries(EDDI-G PRIVATE ${CUDA_LIBRARIES})
+
+status(STATUS "=== EDDI-G configured ===")
