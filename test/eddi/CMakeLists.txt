@@ -63,5 +63,5 @@ add_eddi_test_with_input_file(test_mol.c ${EDDI_INPUT_DATA_DIR}/ADP_ideal.sdf)
 add_eddi_test_with_input_file(test_adenosine.c ${EDDI_INPUT_DATA_DIR}/ADP_ideal.sdf adp.cube adp.bin)
 add_eddi_test_with_input_file(test_8z9k.c ${EDDI_INPUT_DATA_DIR}/8z9k.pdb 8z9k.cube 8z9k.bin)
 add_eddi_test_with_input_file(test_9jt3.c ${EDDI_INPUT_DATA_DIR}/9jt3.pdb 9jt3.cube 9jt3.bin)
-
+add_eddi_test_with_input_file(test_9mxc.c ${EDDI_INPUT_DATA_DIR}/9mxc.pdb 9mxc.cube 9mxc.bin)
 
