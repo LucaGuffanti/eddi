@@ -1,5 +1,6 @@
 import numpy as np
 from slater_wavefunction import SlaterWaveFunction
+from clementi_wavefunction import ClementiWaveFunction
 from constants import *
 from utils.download_data import load_vdw_radii
 from config import *
@@ -26,6 +27,7 @@ class AtomDescriptor:
         self.atomic_number = atomic_number
         self.position = np.array(position)
         self.slater_wf = SlaterWaveFunction(self.atomic_number)
+        self.clementi_wf = ClementiWaveFunction(self.atomic_number)
         self.nuclear_radius = 0
         self.charge = 0
         self.atomic_mass = df[df['AtomicNumber'] == self.atomic_number]['AtomicMass'].values[0]
@@ -35,7 +37,7 @@ class AtomDescriptor:
         self.nuclear_radius = self.nuclear_radius * BOHRS_PER_ANGSTROMS  * 1e10
 
 
-    def radial_coordinate_density(self, radius):
+    def radial_coordinate_density(self, type, radius):
         """
         Calculate the electron density at a given radial distance from the nucleus.
 
@@ -47,9 +49,14 @@ class AtomDescriptor:
         """
         if radius < self.nuclear_radius:
             return 0
-        return self.slater_wf.density(radius)
+        if type == "slater":
+            return self.slater_wf.density(radius)
+        elif type == "clementi":
+            return self.clementi_wf.density(radius)
+        else:
+            raise ValueError("Invalid type. Choose 'slater' or 'clementi'.")
 
-    def cartesian_coordinate_density(self, position):
+    def cartesian_coordinate_density(self, type, position):
         """
         Calculate the electron density at a given Cartesian coordinate.
 
@@ -63,4 +70,9 @@ class AtomDescriptor:
         radius = np.linalg.norm(position - self.position)
         if radius < self.nuclear_radius:
             return 0
-        return self.slater_wf.density(radius)
+        if type == "slater":
+            return self.slater_wf.density(radius)
+        elif type == "clementi":
+            return self.clementi_wf.density(radius)
+        else:
+            raise ValueError("Invalid type. Choose 'slater' or 'clementi'.")

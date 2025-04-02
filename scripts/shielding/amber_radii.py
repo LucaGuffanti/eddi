@@ -2,8 +2,10 @@ from constants import *
 import pandas as pd
 import config
 from slater_wavefunction import SlaterWaveFunction
-from plotting.plot_radii import plot_amber
+from clementi_wavefunction import ClementiWaveFunction
+from plotting.plot_radii import plot_amber, plot_amber_comparison
 import numpy as np
+import os
 
 
 actual_symbols = []
@@ -34,7 +36,7 @@ def compare_amber_vdw():
         print("Density", density)
         vdw_radii_densities.append(density) 
 
-    plot_amber(amber_radii_densities, vdw_radii_densities, actual_symbols)
+    plot_amber('slater', amber_radii_densities, vdw_radii_densities, actual_symbols)
         
     print("Average Isodensity for C-N-O", np.mean(amber_radii_densities[1:3]))
     
@@ -95,9 +97,29 @@ def check_gradient_at_amber_radius():
 
     plt.show()
 
+def compare_slater_clementi():
+    atoms = pd.read_csv(config.VDW_RADII_PATH)
+    atomic_numbers = AMBER_RADII_BOHRS.keys()
+    actual_symbols = atoms[atoms['AtomicNumber'].isin(atomic_numbers)]['Symbol'].values
+
+    slater_densities = []
+    clementi_densities = []
+
+    for am in atomic_numbers:
+        sf = SlaterWaveFunction(am)
+        cf = ClementiWaveFunction(am)
+        radius = AMBER_RADII_BOHRS[am]
+        slater_density = sf.density(radius)
+        clementi_density = cf.density(radius)
+        slater_densities.append(slater_density)
+        clementi_densities.append(clementi_density)
+
+    plot_amber_comparison(['slater', 'clementi'], [slater_densities, clementi_densities], actual_symbols)
 
     
 
 if __name__ == "__main__":
+    os.makedirs("output/radii", exist_ok=True)
     compare_amber_vdw()
     check_gradient_at_amber_radius()
+    compare_slater_clementi()

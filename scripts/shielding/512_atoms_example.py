@@ -28,7 +28,7 @@ if __name__ == "__main__":
     dy = 1
     dz = 1
 
-    density = polyatomic_molecule_density(atoms, x_range, y_range, z_range, mode='vdw', delta_x=dx, delta_y=dy, delta_z=dz, jobs=-1)
+    density = polyatomic_molecule_density('slater', atoms, x_range, y_range, z_range, mode='vdw', delta_x=dx, delta_y=dy, delta_z=dz, jobs=-1)
     
     writer = GaussianCubeIO()
     writer.atoms = atoms

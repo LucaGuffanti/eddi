@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import os
 import csv
 
-from shielding_constants import compute_shielding_constant, compute_clementi_constant
+from shielding_constants import compute_shielding_constant
 from constants import *
 
 

@@ -31,7 +31,7 @@ x_range = [x_min - 5, x_max + 5]
 y_range = [y_min - 5, y_max + 5]
 z_range = [z_min - 5, z_max + 5]
 
-density_field = polyatomic_molecule_density(atoms, x_range, y_range, z_range, 'none', delta_x, delta_y, delta_z)
+density_field = polyatomic_molecule_density('slater', atoms, x_range, y_range, z_range, 'none', delta_x, delta_y, delta_z)
 
 plotter = IsodensityPlotter(
     x_range, y_range, z_range, delta_x, delta_y, delta_z, atoms, 'output/alanine'
@@ -44,4 +44,8 @@ cube_io.npoints = (len(density_field), len(density_field[0]), len(density_field[
 cube_io.data = density_field
 cube_io.n_atoms = len(atoms)
 cube_io.atoms = atoms
-cube_io.write_file('output/alanine/alanine.cube')
+cube_io.write_file('output/alanine/alanine_slater.cube')
+
+density_field = polyatomic_molecule_density('clementi', atoms, x_range, y_range, z_range, 'none', delta_x, delta_y, delta_z)
+cube_io.data = density_field
+cube_io.write_file('output/alanine/alanine_clementi.cube')

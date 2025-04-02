@@ -6,23 +6,23 @@ import tqdm
 import os
 from joblib import Parallel, delayed
 
-def compute_density(x, y, z, atoms, mode='none'):
+def compute_density(type, x, y, z, atoms, mode='none'):
     density = 0.0
     for atom in atoms:
         if mode == 'vdw':
             radius = np.linalg.norm(np.array([x, y, z]) - atom.position)
             if radius <= atom.vdw_radius:
-                density += atom.radial_coordinate_density(radius)
+                density += atom.radial_coordinate_density(type, radius)
         elif mode == '2vdw':
             radius = np.linalg.norm(np.array([x, y, z]) - atom.position)
             if radius <= 2*atom.vdw_radius:
-                density += atom.radial_coordinate_density(radius)
+                density += atom.radial_coordinate_density(type, radius)
         else:
-            density += atom.cartesian_coordinate_density((x, y, z))
+            density += atom.cartesian_coordinate_density(type, (x, y, z))
     return density
 
 
-def polyatomic_molecule_density(atoms, x_range, y_range, z_range, mode='none', delta_x=0.1, delta_y=0.1, delta_z=0.1, jobs=-1):
+def polyatomic_molecule_density(type, atoms, x_range, y_range, z_range, mode='none', delta_x=0.1, delta_y=0.1, delta_z=0.1, jobs=-1):
     """Computes the electron density field around a given polyatomic molecule.
 
     Args:
@@ -58,7 +58,7 @@ def polyatomic_molecule_density(atoms, x_range, y_range, z_range, mode='none', d
         slice = np.zeros((len(y), len(z)))
         for j, y_val in enumerate(y):
             for k, z_val in enumerate(z):
-                slice[j, k] = compute_density(x, y_val, z_val, atoms, mode)
+                slice[j, k] = compute_density(type, x, y_val, z_val, atoms, mode)
         return idx, slice
     
     res = Parallel(n_jobs=jobs)(delayed(compute_for_x_axis)(idx, x_val) for idx, x_val in tqdm.tqdm(enumerate(x), total=len(x), desc="Computing density slices"))
@@ -76,9 +76,9 @@ if __name__ == "__main__":
 
     atoms = [atom1, atom2, atom3, atom4]
 
-    density_field = polyatomic_molecule_density(atoms, [-4, 4], [-4, 4], [-4, 4],  'none', 0.1, 0.1, 0.1)
-    density_field_2 = polyatomic_molecule_density(atoms, [-4, 4], [-4, 4], [-4, 4],  'vdw', 0.1, 0.1, 0.1)
-    density_field_3 = polyatomic_molecule_density(atoms, [-4, 4], [-4, 4], [-4, 4],  '2vdw', 0.1, 0.1, 0.1)
+    density_field = polyatomic_molecule_density('slater', atoms, [-4, 4], [-4, 4], [-4, 4],  'none', 0.1, 0.1, 0.1)
+    density_field_2 = polyatomic_molecule_density('slater', atoms, [-4, 4], [-4, 4], [-4, 4],  'vdw', 0.1, 0.1, 0.1)
+    density_field_3 = polyatomic_molecule_density('slater', atoms, [-4, 4], [-4, 4], [-4, 4],  '2vdw', 0.1, 0.1, 0.1)
 
 
     plotter = isodensity_plotter.IsodensityPlotter(
