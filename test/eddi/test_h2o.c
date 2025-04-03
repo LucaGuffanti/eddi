@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     eddi_density_field_t density_field;
 
     eddi_read_pdb(argv[1], &molecule);
-    eddi_init_field_from_molecule(&density_field, &molecule, 2.0, 0.1, 0.1, 0.1);
+    eddi_init_field_from_molecule(&density_field, &molecule, 6.0, 0.1, 0.1, 0.1);
 
     eddi_compute_density_field(&density_field, &molecule);
     

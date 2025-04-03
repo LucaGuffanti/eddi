@@ -216,6 +216,11 @@ def compute_isodensity_for_volume(density_field, target_volume, dx, dy, dz, mode
 if __name__ == "__main__":
 
     reader = GaussianCubeIO()
-    reader.read('output/alanine/alanine.cube')
+    reader.read('data/h2o_slater.cube')
+    iso_slater = compute_isodensity_for_volume(reader.data, 16.122, reader.spacing[0], reader.spacing[1], reader.spacing[2], accept_exact_isodensity=True)  
 
-    represent_volume_units(reader.data, 0.00274, reader.spacing[0], reader.spacing[1], reader.spacing[2], accept_exact_isodensity=False)
+    reader.read('data/h2o_clementi.cube')
+    iso_clementi =  compute_isodensity_for_volume(reader.data, 16.122, reader.spacing[0], reader.spacing[1], reader.spacing[2], accept_exact_isodensity=True)
+
+    print('Slater', iso_slater)
+    print('Clementi', iso_clementi)

@@ -32,6 +32,17 @@ else()
     message(STATUS "Configuring EDDI in RELEASE mode")
 endif()
 
+# Choice of Wavefunctions
+if (DENSITY_FUNCTION STREQUAL "Slater")
+    message(STATUS "Configuring EDDI with Slater wavefunctions")
+    target_compile_definitions(EDDI PRIVATE EDDI_SLATER_WF)
+elseif(DENSITY_FUNCTION STREQUAL "Clementi")
+    message(STATUS "Configuring EDDI with Clementi wavefunctions")
+    target_compile_definitions(EDDI PRIVATE EDDI_CLEMENTI_WF)
+else()
+    message(FATAL_ERROR "Invalid density function choice. Please choose 'Slater' or 'Clementi'.")
+endif()
+
 # Include directories
 target_include_directories(EDDI PUBLIC ${EDDI_INCLUDE_DIRECTORIES})
 

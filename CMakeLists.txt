@@ -28,6 +28,8 @@ option(BUILD_SHARED_LIB "Build EDDI as a shared library" ON)
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
 option(ENABLE_FASTMATH "Enable fast math optimizations" OFF)
 option(BUILD_TESTS "Build the tests" ON)
+option(DENSITY_FUNCTION "Choose the density function (Slater, Clementi)")
+set_property(CACHE DENSITY_FUNCTION PROPERTY STRINGS "Slater" "Clementi")
 
 # Set default build type if not specified
 if(NOT CMAKE_BUILD_TYPE)
@@ -76,11 +78,8 @@ else()
     
 endif()
 
-
-
 # Find CUDA if available
 find_package(CUDA QUIET)
-
 
 # Eddi-g Library (GPU Accelerated with CUDA)
 if (NOT CUDA_FOUND)
