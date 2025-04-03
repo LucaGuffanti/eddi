@@ -25,20 +25,49 @@ bool eddi_read_pdb(const char* filename, eddi_molecule_t* molecule)
     eddi_input_atom_list_t* atom_list = NULL;
 
     char type_of_record[10];
-    fscanf(fp, "%[^' ']", type_of_record);
+    fscanf(fp, "%6c", type_of_record);
+    type_of_record[6] = '\0';
+
     while(!feof(fp))
     {
         // If either an ATOM or HETATM is read than manage it
-        if((type_of_record[0] == 'A' && type_of_record[1] == 'T') || (type_of_record[0] == 'H' && type_of_record[3] == 'A'))
+        if((type_of_record[0] == 'A' && type_of_record[1] == 'T') /*|| (type_of_record[0] == 'H' && type_of_record[3] == 'A')*/)
         {
             eddi_real_t x;
             eddi_real_t y;
             eddi_real_t z;
             char name[3];
             
-            fscanf(fp, " %*d %*s %*s %*s %*d %lf %lf %lf %*lf %*lf %s", &x, &y, &z, name);
-            // EDDI_DEBUG_PRINT("%lf %lf %lf %s\n", x, y, z, name);
+            // atom serial number - 5 int
+            // atom name - 4 char
+            // alternate location indicator - 1 char
+            // residue name - 4 char
+            // chain identifies - 1 char 
+            // residue sequence number - 4 int
+            // code for insertion of residues - 1 char
+            // x - 8.3 real
+            // y - 8.3 real
+            // z - 8.3 real
+            // occupancy  - 6.2 real
+            // temperature factor - 6.2 real
+            // segment identifier - 4 char
+            
+            char x_s[9];
+            char y_s[9];
+            char z_s[9];
+            fscanf(fp, "%*5d%*c%*4c%*c%*3c%*c%*c%*4c%*c%*c%*c%*c%8c%8c%8c%*6c%*6c%*10c%2s", x_s, y_s, z_s, name);
+        
+            sscanf(x_s, "%lf", &x);
+            sscanf(y_s, "%lf", &y);
+            sscanf(z_s, "%lf", &z);
 
+            EDDI_DEBUG_PRINT("%lf ", x);
+            EDDI_DEBUG_PRINT("%lf ", y);
+            EDDI_DEBUG_PRINT("%lf ", z);
+            
+            EDDI_DEBUG_PRINT("%s\n", name);
+
+            // EDDI_DEBUG_PRINT("%lf %lf %lf %s\n", x, y, z, name);
             // PDB files provide atom information in Angstroms!
             x = x * EDDI_ANGSTROM_TO_BOHR;
             y = y * EDDI_ANGSTROM_TO_BOHR;
@@ -50,12 +79,13 @@ bool eddi_read_pdb(const char* filename, eddi_molecule_t* molecule)
                 return EDDI_RETURN_FAILURE;
             }
             count++;
+            EDDI_DEBUG_PRINT("%d\n", count);
         }
 
         fscanf(fp, "%*[^\n]%*c");
-        fscanf(fp, "%[^' ']", type_of_record);
+        fscanf(fp, "%6c", type_of_record);
     }
-    
+
     fclose(fp);
 
     // Now transform the atomic list to a molecule object.

@@ -63,5 +63,5 @@ add_eddi_test_with_input_file(test_mol.c ${EDDI_INPUT_DATA_DIR}/ADP_ideal.sdf)
 add_eddi_test_with_input_file(test_adenosine.c ${EDDI_INPUT_DATA_DIR}/ADP_ideal.sdf adp_${DENSITY_FUNCTION}.cube adp_${DENSITY_FUNCTION}.bin)
 add_eddi_test_with_input_file(test_8z9k.c ${EDDI_INPUT_DATA_DIR}/8z9k.pdb 8z9k_${DENSITY_FUNCTION}.cube 8z9k_${DENSITY_FUNCTION}.bin)
 add_eddi_test_with_input_file(test_9jt3.c ${EDDI_INPUT_DATA_DIR}/9jt3.pdb 9jt3_${DENSITY_FUNCTION}.cube 9jt3_${DENSITY_FUNCTION}.bin)
-# add_eddi_test_with_input_file(test_9mxc.c ${EDDI_INPUT_DATA_DIR}/9mxc.pdb 9mxc_${DENSITY_FUNCTION}.cube 9mxc_${DENSITY_FUNCTION}.bin)
+add_eddi_test_with_input_file(test_9mxc.c ${EDDI_INPUT_DATA_DIR}/9mxc.pdb 9mxc_${DENSITY_FUNCTION}.cube 9mxc_${DENSITY_FUNCTION}.bin)
 

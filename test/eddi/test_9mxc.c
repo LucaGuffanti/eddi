@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 
     eddi_read_pdb(argv[1], &molecule);
     
-    eddi_init_field_from_molecule(&density_field, &molecule, 1.0, 1, 1, 1);
+    eddi_init_field_from_molecule(&density_field, &molecule, 1.0, 2, 2, 2);
     eddi_compute_density_field(&density_field, &molecule);
     
     eddi_write_gaussian_cube(argv[2], &density_field, &molecule);
