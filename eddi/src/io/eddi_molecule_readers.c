@@ -31,7 +31,7 @@ bool eddi_read_pdb(const char* filename, eddi_molecule_t* molecule)
     while(!feof(fp))
     {
         // If either an ATOM or HETATM is read than manage it
-        if((type_of_record[0] == 'A' && type_of_record[1] == 'T') /*|| (type_of_record[0] == 'H' && type_of_record[3] == 'A')*/)
+        if((type_of_record[0] == 'A' && type_of_record[1] == 'T') || (type_of_record[0] == 'H' && type_of_record[3] == 'A'))
         {
             eddi_real_t x;
             eddi_real_t y;
