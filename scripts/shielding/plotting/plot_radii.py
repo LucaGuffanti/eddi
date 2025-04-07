@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import os
 from constants import *
 
-def plot_type_based_radii(radii, densities, electrons, errors, iters, epsilon, type, *kwargs):
+def plot_type_based_radii(wf_type, radii, densities, electrons, errors, iters, epsilon, type, *kwargs):
     
     assert type in ['bohr', 'vdw', 'density'], "Type must be either 'bohr', 'vdw' or 'density'"
 
     try:
-        os.mkdir("output/radii")
+        os.mkdir(f"output/{wf_type}/radii")
     except FileExistsError:
         pass
 
@@ -68,9 +68,10 @@ def plot_type_based_radii(radii, densities, electrons, errors, iters, epsilon, t
             ax.plot(Z, Z, label="Expected electrons", linestyle='--', color='gray', alpha=0.3)
             ax.legend()
 
-    plt.savefig(f"output/radii/{type}_radii.pdf")
+    plt.savefig(f"output/{wf_type}/radii/{type}_radii.pdf")
+    plt.close()
 
-def plot_all(data_dict):
+def plot_all(wf_type, data_dict):
     bohr_data = data_dict['bohr']
     vdw_data = data_dict['vdw']
     density_data = data_dict['density']
@@ -103,9 +104,10 @@ def plot_all(data_dict):
                     axs[i].axvspan(period-0.5, len(bohr_data[i])+0.5, facecolor=colors[j], alpha=0.2)
         axs[i].legend()    
 
-    plt.savefig("output/radii/comparison.pdf")
+    plt.savefig(f"output/{wf_type}/radii/comparison.pdf")
+    plt.close()
 
-def plot_comparison_separated(data_dict):
+def plot_comparison_separated(wf_type, data_dict):
     bohr_data = data_dict['bohr']
     vdw_data = data_dict['vdw']
     density_data = data_dict['density']
@@ -133,9 +135,10 @@ def plot_comparison_separated(data_dict):
                 else:
                     ax.axvspan(period, len(bohr_data[i]), facecolor=colors[j], alpha=0.2)
         ax.legend()
-        plt.savefig(f"output/radii/comparison_{i}.pdf")
+        plt.savefig(f"output/{wf_type}/radii/comparison_{i}.pdf")
+        plt.close()
 
-def plot_amber(amber_radii_densities, vdw_radii_densities, symbols):
+def plot_amber(wf_type, amber_radii_densities, vdw_radii_densities, symbols):
     fig, ax = plt.subplots()
 
     atomic_numbers = [i for i in range(len(amber_radii_densities))]
@@ -158,5 +161,24 @@ def plot_amber(amber_radii_densities, vdw_radii_densities, symbols):
     ax.set_xlim([-0.5, len(atomic_numbers)-0.5])
     ax.set_ylim([0, max(max(amber_radii_densities), max(vdw_radii_densities))*1.1])
     
-    plt.savefig("output/radii/amber_comparison.pdf")
+    plt.savefig(f"output/{wf_type}/radii/amber_comparison.pdf")
+    plt.close()
+
+
+def plot_amber_comparison(types, densities, symbols):
+    fig, ax = plt.subplots()
+
+    for i, density in enumerate(densities):
+        ax.plot(range(len(density)), density, label=types[i], marker='o', linestyle='-', alpha=0.7)
+
+    ax.set_xticks(range(len(symbols)))
+    ax.set_xticklabels(symbols)
+    ax.set_xlabel("Element")
+    ax.set_ylabel("Density [$e^-/a_0^3$]")
+    ax.set_title("Density Comparison Across Different WF Types at AMBER Radii")
+    ax.legend()
+    ax.grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.5)
+
+    plt.savefig("output/radii/density_comparison_slater_clementi.pdf")
     plt.show()
+    plt.close()

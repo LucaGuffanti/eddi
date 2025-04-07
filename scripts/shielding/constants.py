@@ -31,6 +31,7 @@ SLATER_PRINCIPAL_QUANTUM_NUMBER = {
 }
 
 SLATER_GROWTH_GROUPS = ['1s', '2s-p', '3s-p', '4s-p', '3d']
+CLEMENTI_GROWTH_GROUPS = ['1s', '2s', '2p', '3s', '3p', '4s', '3d', '4p']   
 
 # Highest energy level, equal to the highest quantum number we admit
 HIGHEST_ENERGY_LEVEL = 5

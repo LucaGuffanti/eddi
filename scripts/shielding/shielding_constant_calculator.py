@@ -23,43 +23,45 @@ class ShieldingConstantsCalculator:
         self.ORBITALS_GROWTH_ORDERING  = ORBITALS_GROWTH_ORDERING
         self.SINGLE_ORBITALS           = SINGLE_ORBITALS
         self.SHIELDING_CONSTANTS_TABLE = None
+        self.ATOMIC_NUMBER_TO_CONFIGURATION = None
         self.verbose = verbose
         if self.verbose:
             print("=====INITIALIZING ELECTRON CONFIGURATIONS=====")
+
+    def generate_configuration(self, atomic_number: int) -> str:
+        """Generates the electron configuration of an atom given its atomic number.
+        
+        Args:
+            atomic_number (int): atomic number of the atom
+        
+        Returns:
+            str: electron configuration of the atom
+        """
+        configuration = ""
+        remaining_electrons = atomic_number
+
+        for orbital in self.ORBITALS_GROWTH_ORDERING:
+            if remaining_electrons == 0:
+                break
+
+            if remaining_electrons < MAX_ELECTRONS_PER_LEVEL[orbital[1]]:
+                configuration += f"{orbital}{remaining_electrons}"
+                break
+
+            configuration += f"{orbital}{MAX_ELECTRONS_PER_LEVEL[orbital[1]]} "
+            remaining_electrons -= MAX_ELECTRONS_PER_LEVEL[orbital[1]]
+
+        return configuration
 
     def compute(self, lower_z: int = 1, upper_z: int = 6):
         assert lower_z >= 1 and lower_z <= upper_z, "Invalid range of atomic numbers"
         self.LOWER_BOUND_Z = lower_z
         self.UPPER_BOUND_Z = upper_z
 
-        def generate_configuration(atomic_number: int) -> str:
-            """Generates the electron configuration of an atom given its atomic number.
-            
-            Args:
-                atomic_number (int): atomic number of the atom
-            
-            Returns:
-                str: electron configuration of the atom
-            """
-            configuration = ""
-            remaining_electrons = atomic_number
-
-            for orbital in self.ORBITALS_GROWTH_ORDERING:
-                if remaining_electrons == 0:
-                    break
-
-                if remaining_electrons < MAX_ELECTRONS_PER_LEVEL[orbital[1]]:
-                    configuration += f"{orbital}{remaining_electrons}"
-                    break
-
-                configuration += f"{orbital}{MAX_ELECTRONS_PER_LEVEL[orbital[1]]} "
-                remaining_electrons -= MAX_ELECTRONS_PER_LEVEL[orbital[1]]
-
-            return configuration
-
-        self.ATOMIC_NUMBER_TO_CONFIGURATION = {
-            i : generate_configuration(i).strip() for i in range(self.LOWER_BOUND_Z, self.UPPER_BOUND_Z + 1)
-        }
+        if self.ATOMIC_NUMBER_TO_CONFIGURATION is None:
+            self.ATOMIC_NUMBER_TO_CONFIGURATION = {
+                i : self.generate_configuration(i).strip() for i in range(self.LOWER_BOUND_Z, self.UPPER_BOUND_Z + 1)
+            }
 
         if self.verbose:
             print("=====COMPUTING SHIELDING CONSTANTS=====")
@@ -118,10 +120,28 @@ class ShieldingConstantsCalculator:
         except Exception as e:
             if self.verbose:
                 print(f"Error: {e}")
-            return      
+            return  
+
+    def compute_clementi(self, lower_z: int = 1, upper_z: int = 6):
+        """Computes the Clementi shielding constants for a given range of atomic numbers"""
+        self.LOWER_BOUND_Z = lower_z
+        self.UPPER_BOUND_Z = upper_z
+
+        if self.ATOMIC_NUMBER_TO_CONFIGURATION is None:
+            self.ATOMIC_NUMBER_TO_CONFIGURATION = {
+                i : self.generate_configuration(i).strip() for i in range(self.LOWER_BOUND_Z, self.UPPER_BOUND_Z + 1)
+            }
+
+        self.SHIELDING_CONSTANTS_TABLE = {
+            (self.LOWER_BOUND_Z + z, configuration, target[0]+target[1]) : (compute_clementi_constant(configuration, target[0]+target[1], verbose=self.verbose))
+            for z, configuration in enumerate(self.ATOMIC_NUMBER_TO_CONFIGURATION.values())
+                for target in configuration.split(" ")
+        }
 
 if __name__ == "__main__":
     calc = ShieldingConstantsCalculator(verbose=True)
     calc.compute(1, 6)
     calc.print_data_to_csv()
     calc.read_data_from_csv()
+
+    calc.compute_clementi(1, 6)
