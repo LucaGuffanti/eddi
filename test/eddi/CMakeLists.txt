@@ -55,6 +55,7 @@ add_eddi_test(test_binary_writer.c h2_${DENSITY_FUNCTION}.cube)
 add_eddi_test(test_binary_reader.c h2_${DENSITY_FUNCTION}.cube h21_${DENSITY_FUNCTION}.cube h22_${DENSITY_FUNCTION}.bin h22_${DENSITY_FUNCTION}.cube)
 add_eddi_test(test_symbol_to_number.c)
 add_eddi_test(test_he2.c he2_${DENSITY_FUNCTION}.cube he2_${DENSITY_FUNCTION}.bin)
+add_eddi_test(test_cell_list.c)
 
 # Add tests that require input files to be checked
 add_eddi_test_with_input_file(test_h2o.c ${EDDI_INPUT_DATA_DIR}/h2o.pdb h2o_${DENSITY_FUNCTION}.cube h2o_${DENSITY_FUNCTION}.bin)
@@ -64,4 +65,3 @@ add_eddi_test_with_input_file(test_adenosine.c ${EDDI_INPUT_DATA_DIR}/ADP_ideal.
 add_eddi_test_with_input_file(test_8z9k.c ${EDDI_INPUT_DATA_DIR}/8z9k.pdb 8z9k_${DENSITY_FUNCTION}.cube 8z9k_${DENSITY_FUNCTION}.bin)
 add_eddi_test_with_input_file(test_9jt3.c ${EDDI_INPUT_DATA_DIR}/9jt3.pdb 9jt3_${DENSITY_FUNCTION}.cube 9jt3_${DENSITY_FUNCTION}.bin)
 add_eddi_test_with_input_file(test_9mxc.c ${EDDI_INPUT_DATA_DIR}/9mxc.pdb 9mxc_${DENSITY_FUNCTION}.cube 9mxc_${DENSITY_FUNCTION}.bin)
-
