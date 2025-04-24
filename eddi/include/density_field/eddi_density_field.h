@@ -128,6 +128,16 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
 
 
 /**
+ * @brief Computes the electron density applying spatial hashing and accessing only elements that are within a cutoff radius from a given atom.
+ * 
+ */
+void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi_molecule_t* molecule);
+
+
+void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_molecule_t* molecule);
+
+/**
+ * 
  * @brief Deallocates the electron density field
  * 
  * @param density_field density field to be deallocated
