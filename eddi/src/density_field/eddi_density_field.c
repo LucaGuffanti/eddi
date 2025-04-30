@@ -86,7 +86,7 @@ bool eddi_init_field_from_molecule(
 
     // Set the origin point
     eddi_point_t origin = {min_x, min_y, min_z};
-
+    printf("Field\n");
     // Initialize the density field
     return eddi_new_density_field(density_field, dx, dy, dz, &origin, n_x, n_y, n_z);
 }
@@ -120,13 +120,11 @@ void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecu
 
     eddi_array_t field = density_field->field;
 
-    const eddi_real_t cutoff_radius = 10.0;
+    const eddi_real_t cutoff_radius = 12.0;
     const eddi_real_t max_radius_squared = cutoff_radius * cutoff_radius;
     const size_t n_radii = (size_t) (max_radius_squared);
     eddi_real_t radii_sqrts[n_radii];
     
-    // printf("Maximum radius %lf\n", max_radius_squared);
-    // printf("Computing radii\n");
     // #pragma omp parallel for
     for (int i = 0; i < n_radii; ++i)
     {
@@ -166,7 +164,6 @@ void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecu
             else
             {
                 radius = radii_sqrts[(size_t)radius_2];
-                // printf("Radius sq %lf goes to %zu %lf\n", radius_2, (size_t) radius_2, radius);
                 local_density += molecule->density[atom_idx](radius, 0.0, 0.0);
             }
 
@@ -175,34 +172,37 @@ void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecu
     }
 }
 
-void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_molecule_t* molecule)
+void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_molecule_t* molecule, eddi_cl_info_t* info)
 {
     // Here we also construct the cell list because this is just experimental
 
-    const eddi_real_t cutoff_radius =6.0;
-    const eddi_real_t max_radius_squared = cutoff_radius * cutoff_radius;
-    const size_t n_radii = (size_t) (max_radius_squared);
-    eddi_real_t radii_sqrts[n_radii];
+
+    const eddi_real_t h_cutoff_radius = 12.0;
+    const eddi_real_t l_cutoff_radius = 2.0;
+
+    const eddi_real_t max_radius_squared = h_cutoff_radius * h_cutoff_radius;
+    const eddi_real_t min_radius_squared = l_cutoff_radius * l_cutoff_radius;
+
+    // const size_t n_radii = (size_t) (max_radius_squared);
+    // eddi_real_t radii_sqrts[n_radii];
     
-    // printf("Maximum radius %lf\n", max_radius_squared);
-    // printf("Computing radii\n");
-    // #pragma omp parallel for
-    for (int i = 0; i < n_radii; ++i)
-    {
-        radii_sqrts[i] = sqrt((eddi_real_t)i); 
-    }
+    // // #pragma omp parallel for
+    // for (int i = 0; i < n_radii; ++i)
+    // {
+    //     radii_sqrts[i] = sqrt((eddi_real_t)i); 
+    // }
 
 
-    const eddi_real_t c_x = 10.0; 
-    const eddi_real_t c_y = 10.0;
-    const eddi_real_t c_z = 10.0;
+    const eddi_real_t c_x = info->cx; 
+    const eddi_real_t c_y = info->cy;
+    const eddi_real_t c_z = info->cz;
 
     const eddi_size_t nc_x = density_field->x_size / c_x;
     const eddi_size_t nc_y = density_field->y_size / c_y;
     const eddi_size_t nc_z = density_field->z_size / c_z;
     const eddi_size_t nc_tot = nc_x * nc_y * nc_z;
 
-    const eddi_real_t multiplier = molecule->n_atoms * 0.1;
+    const eddi_real_t multiplier = molecule->n_atoms * 0.7;
     const eddi_size_t c_n_atoms = multiplier + 1;
 
 
@@ -221,9 +221,9 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
     // Now copy the atom data in the cells
     for (eddi_size_t i = 0; i < molecule->n_atoms; ++i)
     {
-        const eddi_size_t cell_x = (eddi_size_t)((molecule->atoms_x[i] - density_field->origin.x) / c_x);
-        const eddi_size_t cell_y = (eddi_size_t)((molecule->atoms_y[i] - density_field->origin.y) / c_y);
-        const eddi_size_t cell_z = (eddi_size_t)((molecule->atoms_z[i] - density_field->origin.z) / c_z);
+        const eddi_size_t cell_x = (eddi_size_t)floor(((molecule->atoms_x[i] - density_field->origin.x) / c_x));
+        const eddi_size_t cell_y = (eddi_size_t)floor(((molecule->atoms_y[i] - density_field->origin.y) / c_y));
+        const eddi_size_t cell_z = (eddi_size_t)floor(((molecule->atoms_z[i] - density_field->origin.z) / c_z));
 
         if (cell_x >= nc_x || cell_y >= nc_y || cell_z >= nc_z)
         {
@@ -256,9 +256,9 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
         const eddi_real_t px = density_field->origin.x + i_x * density_field->dx;
 
 
-        const eddi_size_t cell_x = (eddi_size_t)((px - density_field->origin.x) / c_x);
-        const eddi_size_t cell_y = (eddi_size_t)((py - density_field->origin.y) / c_y);
-        const eddi_size_t cell_z = (eddi_size_t)((pz - density_field->origin.z) / c_z);
+        const eddi_size_t cell_x = (eddi_size_t)floor(((px - density_field->origin.x) / c_x));
+        const eddi_size_t cell_y = (eddi_size_t)floor(((py - density_field->origin.y) / c_y));
+        const eddi_size_t cell_z = (eddi_size_t)floor(((pz - density_field->origin.z) / c_z));
 
         // printf("Point (%f, %f, %f) is in cell (%zu, %zu, %zu)\n", px, py, pz, cell_x, cell_y, cell_z);
 
@@ -317,9 +317,8 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
                         const eddi_real_t dy = py - atom_y;
                         const eddi_real_t dz = pz - atom_z;
                         const eddi_real_t distance_squared = dx * dx + dy * dy + dz * dz;
-                        
-                        if (distance_squared < max_radius_squared && distance_squared > 4.0)
-                            local += cells[neighbor_id].density[atom_idx](radii_sqrts[(eddi_size_t) distance_squared], 0.0, 0.0); 
+                        if (distance_squared < max_radius_squared && distance_squared > min_radius_squared)
+                            local += cells[neighbor_id].density[atom_idx](sqrt(distance_squared), 0.0, 0.0); 
                     }
                 }
             }
@@ -328,17 +327,18 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
     }
 }
 
-void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi_molecule_t* molecule)
+void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi_molecule_t* molecule, eddi_cl_info_t* info)
 {
     // Here we also construct the cell list because this is just experimental
 
-    const eddi_real_t cutoff_radius = 8.0;
-    const eddi_real_t max_radius_squared = cutoff_radius * cutoff_radius;
-    const size_t n_radii = (size_t) (max_radius_squared);
+    const eddi_real_t h_cutoff_radius = 10.0;
+    const eddi_real_t l_cutoff_radius = 2.0;
+
+    const eddi_real_t max_radius_squared = h_cutoff_radius * h_cutoff_radius;
+    const eddi_real_t min_radius_squared = l_cutoff_radius * l_cutoff_radius;
+    // const size_t n_radii = (size_t) (max_radius_squared);
     // eddi_real_t radii_sqrts[n_radii];
     
-    // // printf("Maximum radius %lf\n", max_radius_squared);
-    // // printf("Computing radii\n");
     // // #pragma omp parallel for
     // for (int i = 0; i < n_radii; ++i)
     // {
@@ -346,19 +346,20 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
     // }
 
     EDDI_DEBUG_PRINT("Constructed radii\n");
-    const eddi_real_t c_x = 10.0; 
-    const eddi_real_t c_y = 10.0;
-    const eddi_real_t c_z = 10.0;
+    const eddi_real_t c_x = info->cx; 
+    const eddi_real_t c_y = info->cy;
+    const eddi_real_t c_z = info->cz;
 
     const eddi_size_t nc_x = density_field->x_size / c_x;
     const eddi_size_t nc_y = density_field->y_size / c_y;
     const eddi_size_t nc_z = density_field->z_size / c_z;
     const eddi_size_t nc_tot = nc_x * nc_y * nc_z;
 
-    const eddi_real_t multiplier = molecule->n_atoms * 0.1;
+    printf("%d %d %d\n", nc_x, nc_y, nc_z);
+
+    const eddi_real_t multiplier = molecule->n_atoms * 0.6;
     const eddi_size_t c_n_atoms = multiplier + 1;
-
-
+    
     eddi_molecule_t cells[nc_tot];
     eddi_size_t occupancy[nc_tot];
     EDDI_DEBUG_PRINT("Allocated cells and occupancy\n");
@@ -387,6 +388,7 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
         if (cell_x >= nc_x || cell_y >= nc_y || cell_z >= nc_z)
         {
             printf("[WARNING] Atom is outside the domain boundaries and will be ignored.\n");
+            exit(1);
             continue;
         }
 
@@ -402,7 +404,7 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
 
     const eddi_size_t n_points = density_field->x_size * density_field->y_size * density_field->z_size;
     
-    #pragma omp parallel for
+    #pragma omp parallel for shared(density_field)
     for (eddi_size_t p_idx = 0; p_idx < n_points; ++p_idx)
     {
 
@@ -510,10 +512,7 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
                                     const eddi_real_t delta_z = pz - u_z;
 
                                     const eddi_real_t distance_squared = delta_x * delta_x + delta_y * delta_y + delta_z * delta_z;
-
-                                    if (distance_squared < max_radius_squared && distance_squared > 4.0) {
-                                        partial += cells[neighbor_index].density[idx](sqrt(distance_squared), 0.0, 0.0);
-                                    }
+                                    partial += cells[neighbor_index].density[idx](sqrt(distance_squared), 0.0, 0.0);
                                 }
                             }
                         }
@@ -528,12 +527,11 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
 
 void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_molecule_t* molecule)
 {
-    const eddi_real_t cutoff_radius = 8.0;
+    const eddi_real_t cutoff_radius = 12.0;
     const eddi_real_t max_radius_squared = cutoff_radius * cutoff_radius;
     const size_t n_radii = (size_t) (max_radius_squared);
     eddi_real_t radii_sqrts[n_radii];
     
-    // printf("Maximum radius %lf\n", max_radius_squared);
     // printf("Computing radii\n");
     
     const eddi_size_t atoms = molecule->n_atoms;
@@ -552,6 +550,7 @@ void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_m
     #pragma omp parallel for shared(density_field)
     for (eddi_size_t atom_id = 0; atom_id < atoms; ++atom_id)
     {
+        // printf("%zu\n", atom_id);
         const eddi_real_t starting_x = molecule->atoms_x[atom_id] - cutoff_radius;
         const eddi_real_t starting_y = molecule->atoms_y[atom_id] - cutoff_radius;
         const eddi_real_t starting_z = molecule->atoms_z[atom_id] - cutoff_radius;

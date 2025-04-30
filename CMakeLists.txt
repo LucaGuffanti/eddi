@@ -28,7 +28,12 @@ option(BUILD_SHARED_LIB "Build EDDI as a shared library" ON)
 option(ENABLE_OPENMP "Enable OpenMP support" ON)
 option(ENABLE_FASTMATH "Enable fast math optimizations" OFF)
 option(BUILD_TESTS "Build the tests" ON)
-option(DENSITY_FUNCTION "Choose the density function (Slater, Clementi)")
+option(DENSITY_FUNCTION "Choose the density function (Slater, Clementi)" ON)
+
+if(NOT DENSITY_FUNCTION)
+    set(DENSITY_FUNCTION "Slater" CACHE STRING "Choose the density function (Slater, Clementi)" FORCE)
+endif()
+
 set_property(CACHE DENSITY_FUNCTION PROPERTY STRINGS "Slater" "Clementi")
 
 # Set default build type if not specified

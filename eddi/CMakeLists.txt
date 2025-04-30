@@ -10,7 +10,6 @@ set(EDDI_INCLUDE_DIRECTORIES
 
 message(STATUS "Include directories: ${EDDI_INCLUDE_DIRECTORIES}")
 
-
 add_subdirectory(src)
 
 # Print compilation and linking flags

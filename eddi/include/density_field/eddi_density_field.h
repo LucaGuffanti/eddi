@@ -10,6 +10,7 @@
 #include "eddi_base_includes.h"
 #include "eddi_molecule.h"
 #include "uthash.h"
+#include "time.h"
 
 #ifdef _OPENMP
 #include "omp.h"
@@ -124,14 +125,14 @@ void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecu
  * neighbors of the cell in which a point resides
  * 
  */
-void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_molecule_t* molecule);
+void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_molecule_t* molecule, eddi_cl_info_t* info);
 
 
 /**
  * @brief Computes the electron density applying spatial hashing and accessing only elements that are within a cutoff radius from a given atom.
  * 
  */
-void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi_molecule_t* molecule);
+void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi_molecule_t* molecule, eddi_cl_info_t* info);
 
 
 void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_molecule_t* molecule);

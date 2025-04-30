@@ -56,6 +56,7 @@ add_eddi_test(test_binary_reader.c h2_${DENSITY_FUNCTION}.cube h21_${DENSITY_FUN
 add_eddi_test(test_symbol_to_number.c)
 add_eddi_test(test_he2.c he2_${DENSITY_FUNCTION}.cube he2_${DENSITY_FUNCTION}.bin)
 add_eddi_test(test_cell_list.c)
+add_eddi_test(gaussian_to_binary.c)
 
 # Add tests that require input files to be checked
 add_eddi_test_with_input_file(test_h2o.c ${EDDI_INPUT_DATA_DIR}/h2o.pdb h2o_${DENSITY_FUNCTION}.cube h2o_${DENSITY_FUNCTION}.bin)

@@ -57,17 +57,21 @@ bool eddi_read_pdb(const char* filename, eddi_molecule_t* molecule)
             char z_s[9];
             fscanf(fp, "%*5d%*c%*4c%*c%*3c%*c%*c%*4c%*c%*c%*c%*c%8c%8c%8c%*6c%*6c%*10c%2s", x_s, y_s, z_s, name);
         
+#ifdef EDDI_HIGH_PRECISION
             sscanf(x_s, "%lf", &x);
             sscanf(y_s, "%lf", &y);
             sscanf(z_s, "%lf", &z);
-
-            EDDI_DEBUG_PRINT("%lf ", x);
-            EDDI_DEBUG_PRINT("%lf ", y);
-            EDDI_DEBUG_PRINT("%lf ", z);
+#else
+            sscanf(x_s, "%f", &x);
+            sscanf(y_s, "%f", &y);
+            sscanf(z_s, "%f", &z);
+#endif
+            EDDI_DEBUG_PRINT("%f ", x);
+            EDDI_DEBUG_PRINT("%f ", y);
+            EDDI_DEBUG_PRINT("%f ", z);
             
             EDDI_DEBUG_PRINT("%s\n", name);
 
-            // EDDI_DEBUG_PRINT("%lf %lf %lf %s\n", x, y, z, name);
             // PDB files provide atom information in Angstroms!
             x = x * EDDI_ANGSTROM_TO_BOHR;
             y = y * EDDI_ANGSTROM_TO_BOHR;
@@ -123,8 +127,13 @@ bool eddi_read_mol(const char* filename, eddi_molecule_t* molecule)
     
     for (eddi_size_t i = 0; i < counts; ++i)
     {
+#ifdef EDDI_HIGH_PRECISION
         fscanf(fp, " %lf %lf %lf %[^' '] %*[^\n]%*c", &x[i], &y[i], &z[i], symbol);
-        EDDI_DEBUG_PRINT("[INFO] Atom %zu: %lf %lf %lf %s\n", i + 1, x[i], y[i], z[i], symbol);
+#else
+        fscanf(fp, " %f %f %f %[^' '] %*[^\n]%*c", &x[i], &y[i], &z[i], symbol);
+#endif
+
+        EDDI_DEBUG_PRINT("[INFO] Atom %zu: %f %f %f %s\n", i + 1, x[i], y[i], z[i], symbol);
 
         x[i] *= EDDI_ANGSTROM_TO_BOHR; 
         y[i] *= EDDI_ANGSTROM_TO_BOHR;

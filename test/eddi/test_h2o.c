@@ -10,9 +10,10 @@ int main(int argc, char** argv)
     eddi_density_field_t density_field;
 
     eddi_read_pdb(argv[1], &molecule);
-    eddi_init_field_from_molecule(&density_field, &molecule, 6.0, 0.1, 0.1, 0.1);
+    eddi_init_field_from_molecule(&density_field, &molecule, 6.0, 0.05, 0.05, 0.05);
 
-    eddi_compute_density_field(&density_field, &molecule);
+    eddi_cl_info_t info = {.cx = 10.0, .cy = 10.0, .cz = 10.0};
+    eddi_compute_density_field_cl(&density_field, &molecule, &info);
     
     eddi_write_gaussian_cube(argv[2], &density_field, &molecule);
     eddi_write_binary(argv[3], &density_field);
