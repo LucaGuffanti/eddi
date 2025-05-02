@@ -42,6 +42,19 @@ macro(add_eddi_test_with_input_file TEST_SOURCE INPUT_FILE)
     endif()
 endmacro()
 
+# Macro to add a test with an input directory
+macro(add_eddi_test_with_input_dir TEST_SOURCE INPUT_DIR)
+    eddi_test_prepare(${TEST_SOURCE})
+
+    message(STATUS "Adding test ${TEST_SOURCE} with input directory ${INPUT_DIR}")
+
+    if (EXISTS ${INPUT_DIR} AND IS_DIRECTORY ${INPUT_DIR})
+        add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} ${INPUT_DIR} ${ARGN})
+    else()
+        message(STATUS "-> No input directory. ${TEST_NAME} Skipped.\n")
+    endif()
+endmacro()
+
 set (EDDI_INPUT_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../data)
 message(STATUS "-> Tests in ${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS "-> Input data in ${EDDI_INPUT_DATA_DIR}")
@@ -66,3 +79,5 @@ add_eddi_test_with_input_file(test_adenosine.c ${EDDI_INPUT_DATA_DIR}/ADP_ideal.
 add_eddi_test_with_input_file(test_8z9k.c ${EDDI_INPUT_DATA_DIR}/8z9k.pdb 8z9k_${DENSITY_FUNCTION}.cube 8z9k_${DENSITY_FUNCTION}.bin)
 add_eddi_test_with_input_file(test_9jt3.c ${EDDI_INPUT_DATA_DIR}/9jt3.pdb 9jt3_${DENSITY_FUNCTION}.cube 9jt3_${DENSITY_FUNCTION}.bin)
 add_eddi_test_with_input_file(test_9mxc.c ${EDDI_INPUT_DATA_DIR}/9mxc.pdb 9mxc_${DENSITY_FUNCTION}.cube 9mxc_${DENSITY_FUNCTION}.bin)
+
+add_eddi_test_with_input_dir(benchmark_algs.c ${EDDI_INPUT_DATA_DIR}/benchmark)
