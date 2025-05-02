@@ -86,7 +86,7 @@ bool eddi_init_field_from_molecule(
 
     // Set the origin point
     eddi_point_t origin = {min_x, min_y, min_z};
-    printf("Field\n");
+    // printf("Field\n");
     // Initialize the density field
     return eddi_new_density_field(density_field, dx, dy, dz, &origin, n_x, n_y, n_z);
 }
@@ -176,13 +176,6 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
 {
     // Here we also construct the cell list because this is just experimental
 
-
-    const eddi_real_t h_cutoff_radius = 12.0;
-    const eddi_real_t l_cutoff_radius = 2.0;
-
-    const eddi_real_t max_radius_squared = h_cutoff_radius * h_cutoff_radius;
-    const eddi_real_t min_radius_squared = l_cutoff_radius * l_cutoff_radius;
-
     // const size_t n_radii = (size_t) (max_radius_squared);
     // eddi_real_t radii_sqrts[n_radii];
     
@@ -202,7 +195,7 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
     const eddi_size_t nc_z = density_field->z_size / c_z;
     const eddi_size_t nc_tot = nc_x * nc_y * nc_z;
 
-    const eddi_real_t multiplier = molecule->n_atoms * 0.7;
+    const eddi_real_t multiplier = molecule->n_atoms * 0.2;
     const eddi_size_t c_n_atoms = multiplier + 1;
 
 
@@ -218,6 +211,7 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
         cells[i].density = malloc(sizeof(ptrdiff_t) * c_n_atoms);
     }
 
+    printf("Created\n");
     // Now copy the atom data in the cells
     for (eddi_size_t i = 0; i < molecule->n_atoms; ++i)
     {
@@ -239,14 +233,16 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
         occupancy[cell_idx]++;
     } 
 
-    printf("Cell list with %zu cells. %zu each\n", nc_tot, c_n_atoms);
+    // printf("Cell list with %zu cells. %zu each\n", nc_tot, c_n_atoms);
 
     const eddi_size_t n_points = density_field->x_size * density_field->y_size * density_field->z_size;
     
     #pragma omp parallel for
     for (eddi_size_t p_idx = 0; p_idx < n_points; ++p_idx)
     {
-
+        printf("Point %d/%d\r", p_idx+1, n_points);
+        fflush(stdout);
+        
         const eddi_size_t i_z = p_idx % density_field->z_size;
         const eddi_size_t i_y = (p_idx / density_field->z_size) % density_field->y_size;
         const eddi_size_t i_x = (p_idx / density_field->z_size) / density_field->y_size;
@@ -317,13 +313,21 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
                         const eddi_real_t dy = py - atom_y;
                         const eddi_real_t dz = pz - atom_z;
                         const eddi_real_t distance_squared = dx * dx + dy * dy + dz * dz;
-                        if (distance_squared < max_radius_squared && distance_squared > min_radius_squared)
-                            local += cells[neighbor_id].density[atom_idx](sqrt(distance_squared), 0.0, 0.0); 
+                        local += cells[neighbor_id].density[atom_idx](sqrt(distance_squared), 0.0, 0.0); 
                     }
                 }
             }
         }
         density_field->field[p_idx] = local;
+    }
+
+    // Free allocated memory for cells
+    for (eddi_size_t i = 0; i < nc_tot; ++i)
+    {
+        free(cells[i].atoms_x);
+        free(cells[i].atoms_y);
+        free(cells[i].atoms_z);
+        free(cells[i].density);
     }
 }
 
@@ -521,6 +525,15 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
             }
         }
         density_field->field[p_idx] = partial;
+    }
+
+    // Free allocated memory for cells
+    for (eddi_size_t i = 0; i < nc_tot; ++i)
+    {
+        free(cells[i].atoms_x);
+        free(cells[i].atoms_y);
+        free(cells[i].atoms_z);
+        free(cells[i].density);
     }
 }
 
