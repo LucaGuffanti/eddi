@@ -211,7 +211,6 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
         cells[i].density = malloc(sizeof(ptrdiff_t) * c_n_atoms);
     }
 
-    printf("Created\n");
     // Now copy the atom data in the cells
     for (eddi_size_t i = 0; i < molecule->n_atoms; ++i)
     {
@@ -240,9 +239,7 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
     #pragma omp parallel for
     for (eddi_size_t p_idx = 0; p_idx < n_points; ++p_idx)
     {
-        printf("Point %d/%d\r", p_idx+1, n_points);
-        fflush(stdout);
-        
+
         const eddi_size_t i_z = p_idx % density_field->z_size;
         const eddi_size_t i_y = (p_idx / density_field->z_size) % density_field->y_size;
         const eddi_size_t i_x = (p_idx / density_field->z_size) / density_field->y_size;
@@ -359,7 +356,7 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
     const eddi_size_t nc_z = density_field->z_size / c_z;
     const eddi_size_t nc_tot = nc_x * nc_y * nc_z;
 
-    printf("%d %d %d\n", nc_x, nc_y, nc_z);
+    // printf("%d %d %d\n", nc_x, nc_y, nc_z);
 
     const eddi_real_t multiplier = molecule->n_atoms * 0.6;
     const eddi_size_t c_n_atoms = multiplier + 1;
@@ -404,7 +401,7 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
         occupancy[cell_idx]++;
     } 
 
-    printf("Cell list with %zu cells. %zu each\n", nc_tot, c_n_atoms);
+    // printf("Cell list with %zu cells. %zu each\n", nc_tot, c_n_atoms);
 
     const eddi_size_t n_points = density_field->x_size * density_field->y_size * density_field->z_size;
     
