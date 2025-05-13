@@ -137,6 +137,9 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
 
 void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_molecule_t* molecule);
 
+
+double eddi_compute_volume(eddi_density_field_t* density_field, eddi_real_t isodensity);
+
 /**
  * 
  * @brief Deallocates the electron density field

@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     printf("Starting\n");
     eddi_read_pdb(argv[1], &molecule);
     printf("Init\n");
-    eddi_init_field_from_molecule(&density_field, &molecule, 40.0, resolution, resolution, resolution);
+    eddi_init_field_from_molecule(&density_field, &molecule, 20.0, resolution, resolution, resolution);
 
     
     clock_t start, end;
@@ -24,18 +24,21 @@ int main(int argc, char** argv)
     start = clock();
     eddi_compute_density_field_atom(&density_field, &molecule);
     end = clock();
+    double v_atom = eddi_compute_volume(&density_field, 0.004);
 
-    eddi_cl_info_t info = {.cx = 10.0, .cy = 10.0, .cz = 10.0};
+    eddi_cl_info_t info = {.cx = 14.0, .cy = 14.0, .cz = 14.0};
 
     cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
     printf("eddi_compute_density_field_atom execution time: %f seconds\n", cpu_time_used);
     eddi_write_gaussian_cube(argv[2], &density_field, &molecule);
-
+    
+    
     memset(density_field.field, 0, density_field.x_size * density_field.y_size * density_field.z_size);
-
+    
     start = clock();
     eddi_compute_density_field_cl(&density_field, &molecule, &info);
     end = clock();
+    double v_cl = eddi_compute_volume(&density_field, 0.004);
 
     cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
     printf("eddi_compute_density_field_cl execution time: %f seconds\n", cpu_time_used);
@@ -47,6 +50,8 @@ int main(int argc, char** argv)
     start = clock();
     eddi_compute_density_field_cl_opt(&density_field, &molecule, &info);
     end = clock();
+    double v_opt = eddi_compute_volume(&density_field, 0.004);
+    
 
     cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
     printf("eddi_compute_density_field_cl_opt execution time: %f seconds\n", cpu_time_used);
@@ -56,6 +61,16 @@ int main(int argc, char** argv)
     printf("Saved execution of eddi_compute_density_field_atom in %s\n", argv[2]);
     printf("Saved execution of eddi_compute_density_field_cl in %s\n", argv[3]);
     printf("Saved execution of eddi_compute_density_field_cl_opt in %s\n", argv[4]);
+
+
+    printf("Atom volume : %lf\n", v_atom);
+
+    printf("Cl volume   : %lf\n", v_cl);
+    printf("Rel. err    : %lf (%lf \%)\n ", fabs(v_atom - v_cl)/v_atom, fabs(v_atom - v_cl)/v_atom * 100);
+    printf("Opt volume  : %lf\n", v_opt);
+    printf("Rel. err    : %lf (%lf \%)\n", fabs(v_atom - v_opt)/v_atom, fabs(v_atom - v_opt)/v_atom * 100);
+
+
 
 
     eddi_write_binary(argv[5], &density_field);

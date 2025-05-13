@@ -6,6 +6,173 @@
 
 #include "eddi_density_field.h"
 
+
+eddi_real_t slater(eddi_atomic_number_t z, eddi_real_t r, eddi_real_t theta, eddi_real_t phi)
+{
+    switch (z)
+    {
+    case 1:
+    {
+        // Slater wavefunction for atomic number 1
+        return 0.3183098861837909 * exp(-2 * 1.0 * r);
+    }
+
+    case 2:
+    {
+        // Slater wavefunction for atomic number 2
+        return 2 * 1.56385647082292 * exp(-2 * 1.7 * r);
+    }
+
+    case 3:
+    {
+        // Slater wavefunction for atomic number 3
+        return 2 * 6.26529348975552 * exp(-2 * 2.7 * r) + 0.01231106589279565 * pow(r, 2.0) * exp(-2 * 0.65 * r);
+    }
+
+    case 4:
+    {
+        // Slater wavefunction for atomic number 4
+        return 2 * 16.12335066486755 * exp(-2 * 3.7 * r) + 2 * 0.09348715662341694 * pow(r, 2.0) * exp(-2 * 0.9750000000000001 * r);
+    }
+
+    case 5:
+    {
+        // Slater wavefunction for atomic number 5
+        return 2 * 33.04788731336516 * exp(-2 * 4.7 * r) + 3 * 0.39395410856946067 * pow(r, 2.0) * exp(-2 * 1.3 * r);
+    }
+
+    case 6:
+    {
+        // Slater wavefunction for atomic number 6
+        return 2 * 58.94876275201326 * exp(-2 * 5.7 * r) + 4 * 1.2022525285933259 * pow(r, 2.0) * exp(-2 * 1.625 * r);
+    }
+
+    case 7:
+    {
+        // Slater wavefunction for atomic number 7
+        return 2 * 95.73583629830304 * exp(-2 * 6.7 * r) + 5 * 2.9915890119493427 * pow(r, 2.0) * exp(-2 * 1.9500000000000002 * r);
+    }
+
+    case 8:
+    {
+        // Slater wavefunction for atomic number 8
+        return 2 * 145.3189672691407 * exp(-2 * 7.7 * r) + 6 * 6.46600263938176 * pow(r, 2.0) * exp(-2 * 2.275 * r);
+    }
+
+    case 9:
+    {
+        // Slater wavefunction for atomic number 9
+        return 2 * 209.6080149816861 * exp(-2 * 8.7 * r) + 7 * 12.606531474226806 * pow(r, 2.0) * exp(-2 * 2.6 * r);
+    }
+
+    case 10:
+    {
+        // Slater wavefunction for atomic number 10
+        return 2 * 290.51283875301874 * exp(-2 * 9.7 * r) + 8 * 22.71737905948798 * pow(r, 2.0) * exp(-2 * 2.9250000000000003 * r);
+    }
+
+    case 11:
+    {
+        // Slater wavefunction for atomic number 11
+        return 2 * 389.94329790024904 * exp(-2 * 10.7 * r) + 8 * 50.007109436657835 * pow(r, 2.0) * exp(-2 * 3.4250000000000003 * r) + 0.0016135320335943066 * pow(r, 4.0) * exp(-2 * 0.7333333333333331 * r);
+    }
+
+    case 12:
+    {
+        // Slater wavefunction for atomic number 12
+        return 2 * 509.80925174048366 * exp(-2 * 11.7 * r) + 8 * 98.8387349088708 * pow(r, 2.0) * exp(-2 * 3.9250000000000003 * r) + 2 * 0.00987945178833327 * pow(r, 4.0) * exp(-2 * 0.9500000000000005 * r);
+    }
+
+    case 13:
+    {
+        // Slater wavefunction for atomic number 13
+        return 2 * 652.0205595908079 * exp(-2 * 12.7 * r) + 8 * 180.00942628732454 * pow(r, 2.0) * exp(-2 * 4.425000000000001 * r) + 3 * 0.041619334990451416 * pow(r, 4.0) * exp(-2 * 1.1666666666666667 * r);
+    }
+
+    case 14:
+    {
+        // Slater wavefunction for atomic number 14
+        return 2 * 818.487080768349 * exp(-2 * 13.7 * r) + 8 * 307.4397701413907 * pow(r, 2.0) * exp(-2 * 4.925000000000001 * r) + 4 * 0.13713727109030824 * pow(r, 4.0) * exp(-2 * 1.3833333333333335 * r);
+    }
+
+    case 15:
+    {
+        // Slater wavefunction for atomic number 15
+        return 2 * 1011.1186745901936 * exp(-2 * 14.7 * r) + 8 * 498.57165616526265 * pow(r, 2.0) * exp(-2 * 5.425000000000001 * r) + 5 * 0.37975848643135146 * pow(r, 4.0) * exp(-2 * 1.6000000000000003 * r);
+    }
+
+    case 16:
+    {
+        // Slater wavefunction for atomic number 16
+        return 2 * 1231.825200373448 * exp(-2 * 15.7 * r) + 8 * 774.7661644779737 * pow(r, 2.0) * exp(-2 * 5.925000000000001 * r) + 6 * 0.9238348519132616 * pow(r, 4.0) * exp(-2 * 1.8166666666666664 * r);
+    }
+
+    case 17:
+    {
+        // Slater wavefunction for atomic number 17
+        return 2 * 1482.5165174352162 * exp(-2 * 16.7 * r) + 8 * 1161.7014531331229 * pow(r, 2.0) * exp(-2 * 6.425000000000001 * r) + 7 * 2.032954558631853 * pow(r, 4.0) * exp(-2 * 2.0333333333333337 * r);
+    }
+
+    case 18:
+    {
+        // Slater wavefunction for atomic number 18
+        return 2 * 1765.1024850926005 * exp(-2 * 17.7 * r) + 8 * 1689.7706452760394 * pow(r, 2.0) * exp(-2 * 6.925000000000001 * r) + 8 * 4.129954204672846 * pow(r, 4.0) * exp(-2 * 2.25 * r);
+    }
+
+    case 19:
+    {
+        // Slater wavefunction for atomic number 19
+        return 2 * 2081.4929626627027 * exp(-2 * 18.7 * r) + 8 * 2394.4797166230687 * pow(r, 2.0) * exp(-2 * 7.425000000000001 * r) + 8 * 10.862523867423388 * pow(r, 4.0) * exp(-2 * 2.5833333333333335 * r) + 2.9906737611881975e-05 * pow(r, 5.4) * exp(-2 * 0.5945945945945944 * r);
+    }
+
+    case 20:
+    {
+        // Slater wavefunction for atomic number 20
+        return 2 * 2433.5978094626257 * exp(-2 * 19.7 * r) + 8 * 3316.845382815414 * pow(r, 2.0) * exp(-2 * 7.925000000000001 * r) + 8 * 25.402426141625856 * pow(r, 4.0) * exp(-2 * 2.9166666666666665 * r) + 2 * 0.00026309666655790993 * pow(r, 5.4) * exp(-2 * 0.7702702702702706 * r);
+    }
+
+    case 21:
+    {
+        // Slater wavefunction for atomic number 21
+        return 2 * 2823.3268848094744 * exp(-2 * 20.7 * r) + 8 * 4503.792986750791 * pow(r, 2.0) * exp(-2 * 8.425 * r) + 8 * 54.18151395524859 * pow(r, 4.0) * exp(-2 * 3.25 * r) + 2 * 0.00040479679115536026 * pow(r, 5.4) * exp(-2 * 0.8108108108108107 * r) + 0.01414710605261292 * pow(r, 4.0) * exp(-2 * 1.0 * r);
+    }
+
+    case 22:
+    {
+        // Slater wavefunction for atomic number 22
+        return 2 * 3252.590048020349 * exp(-2 * 21.7 * r) + 8 * 6008.554385940561 * pow(r, 2.0) * exp(-2 * 8.925 * r) + 8 * 107.31936045217444 * pow(r, 4.0) * exp(-2 * 3.5833333333333335 * r) + 2 * 0.0006098558208557976 * pow(r, 5.4) * exp(-2 * 0.8513513513513509 * r) + 2 * 0.05583016062783766 * pow(r, 4.0) * exp(-2 * 1.2166666666666661 * r);
+    }
+
+    case 23:
+    {
+        // Slater wavefunction for atomic number 23
+        return 2 * 3723.2971584123543 * exp(-2 * 22.7 * r) + 8 * 7891.06583987383 * pow(r, 2.0) * exp(-2 * 9.425 * r) + 8 * 200.02482190951136 * pow(r, 4.0) * exp(-2 * 3.9166666666666665 * r) + 2 * 0.0009014374909556084 * pow(r, 5.4) * exp(-2 * 0.891891891891892 * r) + 3 * 0.17583204016482312 * pow(r, 4.0) * exp(-2 * 1.4333333333333336 * r);
+    }
+
+    case 24:
+    {
+        // Slater wavefunction for atomic number 24
+        return 2 * 4237.358075302591 * exp(-2 * 23.7 * r) + 8 * 10218.365897376594 * pow(r, 2.0) * exp(-2 * 9.925 * r) + 8 * 354.31547390255463 * pow(r, 4.0) * exp(-2 * 4.25 * r) + 2 * 0.0013094801520034804 * pow(r, 5.4) * exp(-2 * 0.9324324324324331 * r) + 4 * 0.47103721296316764 * pow(r, 4.0) * exp(-2 * 1.6499999999999997 * r);
+    }
+
+    case 25:
+    {
+        // Slater wavefunction for atomic number 25
+        return 2 * 4796.682658008162 * exp(-2 * 24.7 * r) + 8 * 13064.993283967953 * pow(r, 2.0) * exp(-2 * 10.425 * r) + 8 * 601.0875231006424 * pow(r, 4.0) * exp(-2 * 4.583333333333333 * r) + 2 * 0.0018722314140677398 * pow(r, 5.4) * exp(-2 * 0.9729729729729734 * r) + 5 * 1.117210516657861 * pow(r, 4.0) * exp(-2 * 1.8666666666666671 * r);
+    }
+
+    case 26:
+    {
+        // Slater wavefunction for atomic number 26
+        return 2 * 5403.180765846168 * exp(-2 * 25.7 * r) + 8 * 16513.384789216943 * pow(r, 2.0) * exp(-2 * 10.925 * r) + 8 * 982.5687970790284 * pow(r, 4.0) * exp(-2 * 4.916666666666667 * r) + 2 * 0.0026380387491179032 * pow(r, 5.4) * exp(-2 * 1.0135135135135134 * r) + 6 * 2.409788611299073 * pow(r, 4.0) * exp(-2 * 2.0833333333333335 * r);
+    }
+
+    default:
+        return 0.0;
+    }
+}
+
+
 bool eddi_new_density_field(
     eddi_density_field_t* density_field, 
     const eddi_real_t dx,
@@ -73,16 +240,24 @@ bool eddi_init_field_from_molecule(
     min_x -= padding;
     max_x += padding;
 
+    max_x = min_x + ceil((max_x - min_x) / dx) * dx;
+
+
     min_y -= padding;
     max_y += padding;
 
+    max_y = min_y + ceil((max_y - min_y) / dy) * dy;
+
+
     min_z -= padding;
     max_z += padding;
+    max_z = min_z + ceil((max_z - min_z) / dz) * dz;
+
 
     // Calculate the number of grid points along each direction
-    eddi_size_t n_x = (eddi_size_t)ceil((max_x - min_x) / dx);
-    eddi_size_t n_y = (eddi_size_t)ceil((max_y - min_y) / dy);
-    eddi_size_t n_z = (eddi_size_t)ceil((max_z - min_z) / dz);
+    eddi_size_t n_x = (eddi_size_t)((max_x - min_x) / dx + 0.5);
+    eddi_size_t n_y = (eddi_size_t)((max_y - min_y) / dy + 0.5);
+    eddi_size_t n_z = (eddi_size_t)((max_z - min_z) / dz + 0.5);
 
     // Set the origin point
     eddi_point_t origin = {min_x, min_y, min_z};
@@ -122,14 +297,6 @@ void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecu
 
     const eddi_real_t cutoff_radius = 12.0;
     const eddi_real_t max_radius_squared = cutoff_radius * cutoff_radius;
-    const size_t n_radii = (size_t) (max_radius_squared);
-    eddi_real_t radii_sqrts[n_radii];
-    
-    // #pragma omp parallel for
-    for (int i = 0; i < n_radii; ++i)
-    {
-        radii_sqrts[i] = sqrt((eddi_real_t)i); 
-    }
 
 
 
@@ -157,14 +324,13 @@ void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecu
             const eddi_real_t DeltaZ = cz - z[atom_idx];
             const eddi_real_t radius_2 = DeltaX * DeltaX + DeltaY * DeltaY + DeltaZ * DeltaZ;
             
-            if (radius_2 < dx_2 || radius_2 > max_radius_squared) 
+            if (radius_2 > max_radius_squared) 
             {
                 continue;
             } 
             else
             {
-                radius = radii_sqrts[(size_t)radius_2];
-                local_density += molecule->density[atom_idx](radius, 0.0, 0.0);
+                local_density += molecule->density[atom_idx](sqrt(radius_2), 0.0, 0.0);
             }
 
         }
@@ -249,9 +415,9 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
         const eddi_real_t px = density_field->origin.x + i_x * density_field->dx;
 
 
-        const eddi_size_t cell_x = (eddi_size_t)floor(((px - density_field->origin.x) / c_x));
-        const eddi_size_t cell_y = (eddi_size_t)floor(((py - density_field->origin.y) / c_y));
-        const eddi_size_t cell_z = (eddi_size_t)floor(((pz - density_field->origin.z) / c_z));
+        const eddi_size_t cell_x = (eddi_size_t)floor(((px - density_field->origin.x) / c_x + 1e-6));
+        const eddi_size_t cell_y = (eddi_size_t)floor(((py - density_field->origin.y) / c_y + 1e-6));
+        const eddi_size_t cell_z = (eddi_size_t)floor(((pz - density_field->origin.z) / c_z + 1e-6));
 
         // printf("Point (%f, %f, %f) is in cell (%zu, %zu, %zu)\n", px, py, pz, cell_x, cell_y, cell_z);
 
@@ -328,6 +494,8 @@ void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_mol
     }
 }
 
+
+
 void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi_molecule_t* molecule, eddi_cl_info_t* info)
 {
     // Here we also construct the cell list because this is just experimental
@@ -335,7 +503,7 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
     const eddi_real_t h_cutoff_radius = 10.0;
     const eddi_real_t l_cutoff_radius = 2.0;
 
-    const eddi_real_t max_radius_squared = h_cutoff_radius * h_cutoff_radius;
+    const eddi_real_t max_radius_squared = 12.0 * 12.0;
     const eddi_real_t min_radius_squared = l_cutoff_radius * l_cutoff_radius;
     // const size_t n_radii = (size_t) (max_radius_squared);
     // eddi_real_t radii_sqrts[n_radii];
@@ -372,19 +540,22 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
         cells[i].atoms_x = (eddi_real_t*) malloc(sizeof(eddi_real_t) * c_n_atoms);
         cells[i].atoms_y = (eddi_real_t*) malloc(sizeof(eddi_real_t) * c_n_atoms);
         cells[i].atoms_z = (eddi_real_t*) malloc(sizeof(eddi_real_t) * c_n_atoms);
-        cells[i].density = malloc(sizeof(ptrdiff_t) * c_n_atoms);
+        cells[i].atomic_numbers = (eddi_atomic_number_t*) malloc(sizeof(eddi_atomic_number_t) * c_n_atoms);
+
+        // cells[i].density = malloc(sizeof(ptrdiff_t) * c_n_atoms);
     }
 
     EDDI_DEBUG_PRINT("Initialized cells\n");
     EDDI_DEBUG_PRINT("Adding atoms to cells\n");
 
+    printf("Allocated\n");
     // Now copy the atom data in the cells
     for (eddi_size_t i = 0; i < molecule->n_atoms; ++i)
     {
         EDDI_DEBUG_PRINT("Atom %d\n", i);
-        const eddi_size_t cell_x = (eddi_size_t)((molecule->atoms_x[i] - density_field->origin.x) / c_x);
-        const eddi_size_t cell_y = (eddi_size_t)((molecule->atoms_y[i] - density_field->origin.y) / c_y);
-        const eddi_size_t cell_z = (eddi_size_t)((molecule->atoms_z[i] - density_field->origin.z) / c_z);
+        const eddi_size_t cell_x = (eddi_size_t)floor(((molecule->atoms_x[i] - density_field->origin.x) / c_x));
+        const eddi_size_t cell_y = (eddi_size_t)floor(((molecule->atoms_y[i] - density_field->origin.y) / c_y));
+        const eddi_size_t cell_z = (eddi_size_t)floor(((molecule->atoms_z[i] - density_field->origin.z) / c_z));
 
         if (cell_x >= nc_x || cell_y >= nc_y || cell_z >= nc_z)
         {
@@ -397,10 +568,12 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
         cells[cell_idx].atoms_x[occupancy[cell_idx]] = molecule->atoms_x[i];
         cells[cell_idx].atoms_y[occupancy[cell_idx]] = molecule->atoms_y[i];
         cells[cell_idx].atoms_z[occupancy[cell_idx]] = molecule->atoms_z[i];
-        cells[cell_idx].density[occupancy[cell_idx]] = molecule->density[i];
+        // cells[cell_idx].density[occupancy[cell_idx]] = molecule->density[i];
+        cells[cell_idx].atomic_numbers[occupancy[cell_idx]] = molecule->atomic_numbers[i];
         occupancy[cell_idx]++;
     } 
 
+    printf("Populated\n");
     // printf("Cell list with %zu cells. %zu each\n", nc_tot, c_n_atoms);
 
     const eddi_size_t n_points = density_field->x_size * density_field->y_size * density_field->z_size;
@@ -418,9 +591,9 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
         const eddi_real_t px = density_field->origin.x + i_x * density_field->dx;
 
 
-        const eddi_size_t cell_i = (eddi_size_t)((px - density_field->origin.x) / c_x);
-        const eddi_size_t cell_j = (eddi_size_t)((py - density_field->origin.y) / c_y);
-        const eddi_size_t cell_k = (eddi_size_t)((pz - density_field->origin.z) / c_z);
+        const eddi_size_t cell_i = (eddi_size_t)floor(((px - density_field->origin.x) / c_x + 1e-6));
+        const eddi_size_t cell_j = (eddi_size_t)floor(((py - density_field->origin.y) / c_y + 1e-6));
+        const eddi_size_t cell_k = (eddi_size_t)floor(((pz - density_field->origin.z) / c_z + 1e-6));
 
         // printf("Point (%f, %f, %f) is in cell (%zu, %zu, %zu)\n", px, py, pz, cell_x, cell_y, cell_z);
 
@@ -489,10 +662,9 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
             {
                 for (int inner_k = 0; inner_k <= 2; ++inner_k)
                 {
-                    // Move the computation of the distance here.
 
                     const size_t idx = inner_i * 3 * 3 + inner_j * 3 + inner_k;
-                    if (arr[idx] < max_radius_squared)
+                    if (arr[idx] <= max_radius_squared)
                     {
                         const size_t neighbor_i = cell_i + inner_i - 1;
                         const size_t neighbor_j = cell_j + inner_j - 1;
@@ -513,7 +685,11 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
                                     const eddi_real_t delta_z = pz - u_z;
 
                                     const eddi_real_t distance_squared = delta_x * delta_x + delta_y * delta_y + delta_z * delta_z;
-                                    partial += cells[neighbor_index].density[idx](sqrt(distance_squared), 0.0, 0.0);
+                                    if (distance_squared <= 12*12.0)
+                                    {
+                                        partial += slater(cells[neighbor_index].atomic_numbers[idx], sqrt(distance_squared), 0.0, 0.0);
+
+                                    }
                                 }
                             }
                         }
@@ -530,7 +706,7 @@ void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi
         free(cells[i].atoms_x);
         free(cells[i].atoms_y);
         free(cells[i].atoms_z);
-        free(cells[i].density);
+        free(cells[i].atomic_numbers);
     }
 }
 
@@ -540,7 +716,7 @@ void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_m
     const eddi_real_t cutoff_radius = 12.0;
     const eddi_real_t max_radius_squared = cutoff_radius * cutoff_radius;
     const size_t n_radii = (size_t) (max_radius_squared);
-    eddi_real_t radii_sqrts[n_radii];
+    // eddi_real_t radii_sqrts[n_radii];
     
     // printf("Computing radii\n");
     
@@ -561,9 +737,9 @@ void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_m
     for (eddi_size_t atom_id = 0; atom_id < atoms; ++atom_id)
     {
         // printf("%zu\n", atom_id);
-        const eddi_real_t starting_x = molecule->atoms_x[atom_id] - cutoff_radius;
-        const eddi_real_t starting_y = molecule->atoms_y[atom_id] - cutoff_radius;
-        const eddi_real_t starting_z = molecule->atoms_z[atom_id] - cutoff_radius;
+        const eddi_real_t starting_x = ox + floor((molecule->atoms_x[atom_id] - cutoff_radius - ox) / dx) * dx;
+        const eddi_real_t starting_y = oy + floor((molecule->atoms_y[atom_id] - cutoff_radius - oy) / dy) * dy;
+        const eddi_real_t starting_z = oz + floor((molecule->atoms_z[atom_id] - cutoff_radius - oz) / dz) * dz;
 
         const eddi_real_t end_x = molecule->atoms_x[atom_id] + cutoff_radius;
         const eddi_real_t end_y = molecule->atoms_y[atom_id] + cutoff_radius;
@@ -575,15 +751,15 @@ void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_m
             {
                 for (eddi_real_t z = starting_z; z <= end_z; z += dz)
                 {
-                    const eddi_size_t idx_x = (eddi_size_t)((x - ox) / dx);
-                    const eddi_size_t idx_y = (eddi_size_t)((y - oy) / dy);
-                    const eddi_size_t idx_z = (eddi_size_t)((z - oz) / dz);
+                    const eddi_size_t idx_x = (eddi_size_t)floor(((x - ox) / dx + 1e-6));
+                    const eddi_size_t idx_y = (eddi_size_t)floor(((y - oy) / dy + 1e-6));
+                    const eddi_size_t idx_z = (eddi_size_t)floor(((z - oz) / dz + 1e-6));
 
                     if (idx_x < n_x && idx_y < n_y && idx_z < n_z)
                     {
                         const eddi_size_t idx = idx_x * n_y * n_z + idx_y * n_z + idx_z;
                         #pragma omp atomic
-                        density_field->field[idx] += molecule->density[atom_id](sqrt((x - molecule->atoms_x[atom_id]) * (x - molecule->atoms_x[atom_id]) +
+                        density_field->field[idx] += slater(molecule->atomic_numbers[atom_id], sqrt((x - molecule->atoms_x[atom_id]) * (x - molecule->atoms_x[atom_id]) +
                                                                                     (y - molecule->atoms_y[atom_id]) * (y - molecule->atoms_y[atom_id]) +
                                                                                     (z - molecule->atoms_z[atom_id]) * (z - molecule->atoms_z[atom_id])), 0.0, 0.0);
                     }
@@ -592,6 +768,49 @@ void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_m
         }
         
     }
+}
+
+double eddi_compute_volume(eddi_density_field_t* density_field, eddi_real_t isodensity)
+{
+    eddi_size_t nx = density_field->x_size;
+    eddi_size_t ny = density_field->y_size;
+    eddi_size_t nz = density_field->z_size;
+
+    int count = 0;
+    for (int i = 0; i < nx-1; ++i)
+    {
+        for (int j = 0; j < ny-1; ++j)
+        {
+            for (int k = 0; k < nz-1; ++k)
+            {
+                // Check if the cube with origin in i, j, k has all vertices inside the isodensity
+                bool all_inside = true;
+                for (int di = 0; di <= 1; ++di)
+                {
+                    for (int dj = 0; dj <= 1; ++dj)
+                    {
+                        for (int dk = 0; dk <= 1; ++dk)
+                        {
+                            eddi_size_t vertex_idx = (i + di) * ny * nz + (j + dj) * nz + (k + dk);
+                            if (density_field->field[vertex_idx] <= isodensity)
+                            {
+                                all_inside = false;
+                                break;
+                            }
+                        }
+                        if (!all_inside) break;
+                    }
+                    if (!all_inside) break;
+                }
+
+                if (all_inside)
+                {
+                    count ++;
+                }
+            }
+        }
+    }
+    return count * density_field->dx * density_field->dy * density_field->dz;
 }
 
 void eddi_free_density_field(eddi_density_field_t* density_field)
