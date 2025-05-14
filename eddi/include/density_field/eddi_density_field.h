@@ -9,6 +9,8 @@
 
 #include "eddi_base_includes.h"
 #include "eddi_molecule.h"
+#include "uthash.h"
+#include "time.h"
 
 #ifdef _OPENMP
 #include "omp.h"
@@ -119,6 +121,29 @@ bool eddi_init_field_from_molecule(
 void eddi_compute_density_field(eddi_density_field_t* density_field, eddi_molecule_t* molecule);
 
 /**
+ * @brief Computes the electron density field, grouping atoms in a cell list and accessing only the 
+ * neighbors of the cell in which a point resides
+ * 
+ */
+void eddi_compute_density_field_cl(eddi_density_field_t* density_field, eddi_molecule_t* molecule, eddi_cl_info_t* info);
+
+
+/**
+ * @brief Computes the electron density applying spatial hashing and accessing only elements that are within a cutoff radius from a given atom.
+ * 
+ */
+void eddi_compute_density_field_cl_opt(eddi_density_field_t* density_field, eddi_molecule_t* molecule, eddi_cl_info_t* info);
+void eddi_compute_density_field_cl_opt_v2(eddi_density_field_t* density_field, eddi_molecule_t* molecule, eddi_cl_info_t* info);
+
+
+void eddi_compute_density_field_atom(eddi_density_field_t* density_field, eddi_molecule_t* molecule);
+
+
+
+double eddi_compute_volume(eddi_density_field_t* density_field, eddi_real_t isodensity);
+
+/**
+ * 
  * @brief Deallocates the electron density field
  * 
  * @param density_field density field to be deallocated

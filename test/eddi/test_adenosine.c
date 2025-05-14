@@ -11,13 +11,15 @@ int main(int argc, char** argv)
     eddi_read_mol(argv[1], &molecule);
     // eddi_print_molecule(&molecule);
     puts("Initializing field");
-    bool res1 = !eddi_init_field_from_molecule(&density_field, &molecule, 1.0, 0.25, 0.25, 0.25);
+    bool res1 = !eddi_init_field_from_molecule(&density_field, &molecule, 5.0, 1.0, 1.0, 1.0);
 
     puts("Computing density");
     eddi_compute_density_field(&density_field, &molecule);
 
     puts("Printing to gaussian");
     bool res2 = !eddi_write_gaussian_cube(argv[2], &density_field, &molecule);
+
+    eddi_write_binary(argv[3], &density_field);
 
     eddi_free_atomic_data();
     eddi_free_molecule(&molecule);

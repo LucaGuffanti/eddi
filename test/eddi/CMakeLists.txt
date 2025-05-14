@@ -42,6 +42,19 @@ macro(add_eddi_test_with_input_file TEST_SOURCE INPUT_FILE)
     endif()
 endmacro()
 
+# Macro to add a test with an input directory
+macro(add_eddi_test_with_input_dir TEST_SOURCE INPUT_DIR)
+    eddi_test_prepare(${TEST_SOURCE})
+
+    message(STATUS "Adding test ${TEST_SOURCE} with input directory ${INPUT_DIR}")
+
+    if (EXISTS ${INPUT_DIR} AND IS_DIRECTORY ${INPUT_DIR})
+        add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME} ${INPUT_DIR} ${ARGN})
+    else()
+        message(STATUS "-> No input directory. ${TEST_NAME} Skipped.\n")
+    endif()
+endmacro()
+
 set (EDDI_INPUT_DATA_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../data)
 message(STATUS "-> Tests in ${CMAKE_CURRENT_SOURCE_DIR}")
 message(STATUS "-> Input data in ${EDDI_INPUT_DATA_DIR}")
@@ -55,6 +68,8 @@ add_eddi_test(test_binary_writer.c h2_${DENSITY_FUNCTION}.cube)
 add_eddi_test(test_binary_reader.c h2_${DENSITY_FUNCTION}.cube h21_${DENSITY_FUNCTION}.cube h22_${DENSITY_FUNCTION}.bin h22_${DENSITY_FUNCTION}.cube)
 add_eddi_test(test_symbol_to_number.c)
 add_eddi_test(test_he2.c he2_${DENSITY_FUNCTION}.cube he2_${DENSITY_FUNCTION}.bin)
+add_eddi_test(test_cell_list.c)
+add_eddi_test(gaussian_to_binary.c)
 
 # Add tests that require input files to be checked
 add_eddi_test_with_input_file(test_h2o.c ${EDDI_INPUT_DATA_DIR}/h2o.pdb h2o_${DENSITY_FUNCTION}.cube h2o_${DENSITY_FUNCTION}.bin)
@@ -65,3 +80,4 @@ add_eddi_test_with_input_file(test_8z9k.c ${EDDI_INPUT_DATA_DIR}/8z9k.pdb 8z9k_$
 add_eddi_test_with_input_file(test_9jt3.c ${EDDI_INPUT_DATA_DIR}/9jt3.pdb 9jt3_${DENSITY_FUNCTION}.cube 9jt3_${DENSITY_FUNCTION}.bin)
 add_eddi_test_with_input_file(test_9mxc.c ${EDDI_INPUT_DATA_DIR}/9mxc.pdb 9mxc_${DENSITY_FUNCTION}.cube 9mxc_${DENSITY_FUNCTION}.bin)
 
+add_eddi_test_with_input_dir(benchmark_algs.c ${EDDI_INPUT_DATA_DIR}/benchmark)

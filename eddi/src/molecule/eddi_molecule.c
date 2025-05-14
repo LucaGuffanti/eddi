@@ -64,7 +64,7 @@ bool eddi_atom_list_to_molecule(eddi_input_atom_list_t* list, eddi_molecule_t* m
 void eddi_print_molecule(eddi_molecule_t* molecule)
 {
     for (eddi_size_t it = 0; it < molecule->n_atoms; ++it)
-        printf("Atom %zu: (%lf, %lf, %lf), Atomic Number: %d\n", 
+        printf("Atom %zu: (%f, %f, %f), Atomic Number: %d\n", 
                it, 
                molecule->atoms_x[it], 
                molecule->atoms_y[it], 

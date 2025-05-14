@@ -87,6 +87,7 @@ bool eddi_read_gaussian_cube(const char* filename, eddi_density_field_t* density
     fscanf(fp,"%*[^\n]%*c");
 
     // Then, we have the number of atoms and position of the origin
+#ifdef EDDI_HIGH_PRECISION
     fscanf(fp, " %zu %lf %lf %lf", &n_atoms, &origin.x, &origin.y, &origin.z);
     EDDI_DEBUG_PRINT("Atoms: %ld  Origin: %f %f %f\n", n_atoms, origin.x, origin.y, origin.z);
 
@@ -94,14 +95,23 @@ bool eddi_read_gaussian_cube(const char* filename, eddi_density_field_t* density
     fscanf(fp, " %d %lf %*lf %*lf", &x_size, &dx);
     fscanf(fp, " %d %*lf %lf %*lf", &y_size, &dy);
     fscanf(fp, " %d %*lf %*lf %lf", &z_size, &dz);
+#else
+    fscanf(fp, " %zu %f %f %f", &n_atoms, &origin.x, &origin.y, &origin.z);
+    EDDI_DEBUG_PRINT("Atoms: %ld  Origin: %f %f %f\n", n_atoms, origin.x, origin.y, origin.z);
+
+    // Then, the number of points along each direction and the resolution
+    fscanf(fp, " %d %f %*f %*f", &x_size, &dx);
+    fscanf(fp, " %d %*f %f %*f", &y_size, &dy);
+    fscanf(fp, " %d %*f %*f %f", &z_size, &dz);
+#endif
 
     // TODO: add support for angstrom to bohrs conversion.
     assert(x_size > 0 && y_size > 0 && z_size > 0 && "ANGSTROMS TO BOHRS CONVERSION NOT YET SUPPORTED");
 
     
-    EDDI_DEBUG_PRINT("nx: %d dx: %lf\n", x_size, dx);
-    EDDI_DEBUG_PRINT("ny: %d dy: %lf\n", y_size, dy);
-    EDDI_DEBUG_PRINT("nz: %d dz: %lf\n", z_size, dz);
+    EDDI_DEBUG_PRINT("nx: %d dx: %f\n", x_size, dx);
+    EDDI_DEBUG_PRINT("ny: %d dy: %f\n", y_size, dy);
+    EDDI_DEBUG_PRINT("nz: %d dz: %f\n", z_size, dz);
 
     // Then a list of atoms
     
@@ -113,8 +123,12 @@ bool eddi_read_gaussian_cube(const char* filename, eddi_density_field_t* density
     // TODO: add support for the charges if necessary
     for (eddi_size_t atom_idx = 0; atom_idx < n_atoms; ++atom_idx)
     {
+#ifdef EDDI_HIGH_PRECISION
         fscanf(fp, " %hhd %*lf %lf %lf %lf\n", &atomic_numbers[atom_idx], &x_positions[atom_idx], &y_positions[atom_idx], &z_positions[atom_idx]);
-        EDDI_DEBUG_PRINT("Atom %zu: Atomic Number: %d, Position: (%lf, %lf, %lf)\n", 
+#else
+    fscanf(fp, " %hhd %*lf %f %f %f\n", &atomic_numbers[atom_idx], &x_positions[atom_idx], &y_positions[atom_idx], &z_positions[atom_idx]);
+#endif
+        EDDI_DEBUG_PRINT("Atom %zu: Atomic Number: %d, Position: (%f, %f, %f)\n", 
                  atom_idx, atomic_numbers[atom_idx], 
                  x_positions[atom_idx], y_positions[atom_idx], z_positions[atom_idx]);
     }
